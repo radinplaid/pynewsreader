@@ -4,9 +4,6 @@
 __all__ = ['logger', 'strip_html', 'PyNewsReader']
 
 # %% ../00_core.ipynb 3
-#| export
-
-# %% ../00_core.ipynb 4
 import reader
 from typing import *
 from bs4 import BeautifulSoup
@@ -14,11 +11,14 @@ from rich import print
 from rich.panel import Panel
 from rich.text import Text
 import logging
+
 logger = logging.getLogger(__name__)
+
 
 def strip_html(s: str):
     s = BeautifulSoup(s)
     return s.text
+
 
 class PyNewsReader(reader.Reader):
     def __init__(self, dbpath=None, feeds=None):
@@ -27,13 +27,9 @@ class PyNewsReader(reader.Reader):
             dbpath = "db.sqlite"
 
         self.reader = reader.make_reader(
-            "db.sqlite", 
-            plugins=[
-                "reader.enclosure_dedupe",
-                "reader.entry_dedupe"
-            ]
+            "db.sqlite", plugins=["reader.enclosure_dedupe", "reader.entry_dedupe"]
         )
-    
+
         if feeds is None or self.reader.get_feed_counts().total == 0:
             feeds = [
                 "https://rss.cbc.ca/lineup/topstories.xml",
@@ -54,48 +50,66 @@ class PyNewsReader(reader.Reader):
         for feed in feeds:
             logger.info("Feeds not specified, starting you off with some Canadian news")
             self.reader.add_feed(feed, exist_ok=True)
-        
-        super().__init__(self.reader._storage, self.reader._search, self.reader._parser, self.reader._reserved_name_scheme)
+
+        super().__init__(
+            self.reader._storage,
+            self.reader._search,
+            self.reader._parser,
+            self.reader._reserved_name_scheme,
+        )
         self.enable_search()
 
-    def print_entries(self, entries: List[reader.Entry]):
+    def _print_entries(self, entries: List[reader.Entry], mark_as_read: bool = True, limit: int = 10):
         """
         Pretty print entries - supports reader.Reader.get_entries arguments
         """
+        displayed_links = set()
         for e in entries:
-            if e.published:
-                published_date = Text(
-                    "Date: " + e.published.isoformat()[:10], justify="center"
-                )
+            if e.link in displayed_links:
+                # Don't display duplicates
+                r.mark_entry_as_read(e)
             else:
-                published_date = Text("Date: Unknown", justify="center")
-            print(
-                Panel(
-                    published_date + "\n" + Text(strip_html(e.summary), justify=None),
-                    title=f"[link={e.link}]{e.title}[/link]",
-                    subtitle=e.feed.title or e.feed_url,
+                displayed_links.add(e.link)
+                if e.published:
+                    published_date = Text(
+                        "Date: " + e.published.isoformat()[:10], justify="center"
+                    )
+                else:
+                    published_date = Text("Date: Unknown", justify="center")
+                if mark_as_read:
+                    r.mark_entry_as_read(e)
+                print(
+                    Panel(
+                        published_date
+                        + "\n\n"
+                        + Text(strip_html(e.summary) + "\n", justify=None),
+                        title=f"[link={e.link}]{e.title}[/link]",
+                        subtitle=e.feed.title or e.feed_url,
+                    )
                 )
-            )
-            print()
-    
-    def show(self, limit: int = 5, **kwargs) -> type(None):
-        """Pretty print entries - supports reader.Reader.get_entries arguments"""
-        self.print_entries(self.get_entries(**kwargs, limit=limit))    
-    
-    def search(self, query:str):
-        """Search entries and pretty print results"""
-        entries = []
-        for e in r.search_entries(query):
-            entries.append(self.search_to_entry(e))
-        self.print_entries(entries)
-    
-    def search_to_entry(self, search_result):
+                print()
+            if len(displayed_links) == limit:
+                return
+
+    def _search_to_entry(self, search_result):
         for i in r.get_entries():
             if i.id == search_result.id and i.feed_url == search_result.feed_url:
                 return i
-    
+
+    def show(self, limit: int = 5, read: bool = None, **kwargs) -> type(None):
+        """Pretty print entries - supports reader.Reader.get_entries arguments"""
+        self._print_entries(self.get_entries(**kwargs, read=read, limit=limit*2), limit=limit)
+
+    def search(self, query: str, mark_as_read: bool = True):
+        """Search entries and pretty print results"""
+        entries = []
+        for e in r.search_entries(query):
+            if mark_as_read:
+                r.mark_entry_as_read(e)
+            entries.append(self._search_to_entry(e))
+        self._print_entries(entries)
+
     def update(self):
         """Update feeds and search"""
         self.update_feeds()
         self.update_search()
-
