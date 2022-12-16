@@ -24,7 +24,7 @@ def show_entries(dbpath = None, limit: int = 5, read: bool = False, important: b
     if dbpath is None:
         dbpath = "./db.sqlite"
     nr = PyNewsReader(dbpath=dbpath)
-    nr.list(limit, read, important, mark_as_read)
+    nr.show(limit, read, important, mark_as_read)
 
 # %% ../01_cli.ipynb 6
 def update(dbpath = None, limit: int = 5, read: bool = None, important: bool = None, mark_as_read: bool = False):

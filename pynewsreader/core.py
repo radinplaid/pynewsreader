@@ -152,7 +152,7 @@ class PyNewsReader:
         """
         return [self._get_feed_title(i.url) for i in self._reader.get_feeds()]
 
-    def list(self, limit: int = 5, read: bool = None, important: bool = None, mark_as_read: bool = False):
+    def show(self, limit: int = 5, read: bool = None, important: bool = None, mark_as_read: bool = False):
         """Pretty print entries
 
         Args:
