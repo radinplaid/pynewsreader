@@ -16,7 +16,7 @@ logger = logging.getLogger(__name__)
 
 
 def strip_html(s: str):
-    s = BeautifulSoup(s)
+    s = BeautifulSoup(s, features="lxml")
     return s.text
 
 
@@ -113,7 +113,7 @@ class PyNewsReader:
         self._reader.update_feeds()
         self._reader.update_search()
 
-    def get_entries(self, important: bool = None, read: Union[None, bool] = None, limit: int = 10):
+    def _get_entries(self, important: bool = None, read: Union[None, bool] = None, limit: int = 10):
         """Get entries in reader.Entry format
 
         Args:
@@ -144,7 +144,7 @@ class PyNewsReader:
 
         self._reader.delete_feed(feed.url)
 
-    def list_feeds(self):
+    def feeds(self):
         """List pynewsreader feeds
 
         Returns:
@@ -152,7 +152,7 @@ class PyNewsReader:
         """
         return [self._get_feed_title(i.url) for i in self._reader.get_feeds()]
 
-    def show(self, limit: int = 5, read: bool = None, important: bool = None, mark_as_read: bool = False):
+    def list(self, limit: int = 5, read: bool = None, important: bool = None, mark_as_read: bool = False):
         """Pretty print entries
 
         Args:
@@ -160,7 +160,7 @@ class PyNewsReader:
             read (bool, optional): Show read entries (True), unread entries (False), or all entries (None). Defaults to None.
             mark_as_read (bool, optional): Mark displayed entries as read. Defaults to False.
         """
-        self._print_entries(self.get_entries(
+        self._print_entries(self._get_entries(
             read=read, important=important, limit=limit*2), limit=limit, mark_as_read=mark_as_read)
 
     def search(self, query: str, mark_as_read: bool = True, limit: int = 10):
@@ -181,7 +181,16 @@ class PyNewsReader:
         """
         reader.Reader.mark_entry_as_important(entry)
 
-    def tag_entry(self, entry: reader.Entry, tag_key: str, tag_value: Dict = None):
+    def mark_unimportant(self, entry: reader.Entry):
+        """Mark entry as important
+
+        Args:
+            entry (reader.Entry): Entry to mark as important
+        """
+        reader.Reader.mark_entry_as_unimportant(entry)
+
+        
+    def tag(self, entry: reader.Entry, tag_key: str, tag_value: Dict = None):
         """Tag an entry
 
         Args:
