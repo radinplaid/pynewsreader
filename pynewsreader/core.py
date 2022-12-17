@@ -20,7 +20,7 @@ logger = logging.getLogger(__name__)
 
 
 def strip_html(s: str):
-    s = BeautifulSoup(s, features="lxml")
+    s = BeautifulSoup(s, features='html')
     return s.text
 
 # %% ../00_core.ipynb 4
