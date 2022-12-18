@@ -20,7 +20,7 @@ logger = logging.getLogger(__name__)
 
 
 def strip_html(s: str):
-    s = BeautifulSoup(s, features='html')
+    s = BeautifulSoup(s, "html.parser")
     return s.text
 
 # %% ../00_core.ipynb 4
@@ -40,7 +40,7 @@ class Feed:
         if tag in self.tags:
             self.tags.remove(tag)
 
-# %% ../00_core.ipynb 6
+# %% ../00_core.ipynb 5
 import rich
 
 
@@ -77,16 +77,16 @@ class PyNewsReader:
                 if mark_as_read:
                     self._reader.mark_entry_as_read(e)
 
-                feed_title = self._get_feed_title(e.original_feed_url)
-                panel_body = f"Link: [link={e.link}]{e.link}[/link]"+"\n"
-                panel_body += str(published_date) + "\n"
-                panel_body += "Source: "+feed_title + "\n\n"
-                panel_body += strip_html(e.summary) + "\n"
+                feed_title = f"[bold]{self._get_feed_title(e.original_feed_url)}[/bold]"
+                panel_body = f"Title: [bold]{e.title}[/bold]"+"\n"
+                panel_body += str(published_date) + "\n\n"
+                panel_body += strip_html(e.summary).strip() + "\n"
 
                 console.print(
                     Panel(
                         panel_body,
-                        title=f"[link={e.link}]{e.title}[/link]",
+                        title=feed_title,
+                        subtitle=f"[link={e.link}]{e.link}[/link]"
                     )
                 )
                 console.print()
@@ -133,6 +133,14 @@ class PyNewsReader:
         """
         return self._reader.get_entries(read=read, limit=limit, important=important)
 
+    def _get_tags(self, entry: reader.Entry):
+        """Get tags for a given entry"""
+        # To set a tag:
+        # r._reader.set_tag(test[0], "foobar")
+        # To delete a tag:
+        # r._reader.delete_tag(test[0], "foobar")
+        return [i[0] for i in list(self._reader.get_tags(entry))]
+    
     def add_feed(self, feed: Feed):
         """Add feed to pynewsreader
 
@@ -218,3 +226,5 @@ class PyNewsReader:
             tag_value (Dict, optional): Value of tag. Defaults to None.
         """
         reader.Reader.set_tag(entry, tag_key, tag_value)
+        
+    
