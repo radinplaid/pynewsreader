@@ -141,15 +141,20 @@ class PyNewsReader:
         # r._reader.delete_tag(test[0], "foobar")
         return [i[0] for i in list(self._reader.get_tags(entry))]
 
-    def add_feed(self, feed: Feed):
+    def add_feed(self, feed: Union[Feed, str]):
         """Add feed to pynewsreader
 
         Args:
             feed (Feed): pynewsreader Feed to add
         """
-        self._reader.add_feed(feed.url, exist_ok=True)
-        if feed.name:
+        if isinstance(feed, Feed):
             self._feed_names[feed.url] = feed.name
+            self._reader.add_feed(feed.url, exist_ok=True)
+        elif isinstance(feed, str):
+            self._reader.add_feed(feed, exist_ok=True)
+        else:
+            raise Exception("Must be str or Feed type to add")
+            
 
     def remove_feed(self, feed: Feed):
         """Remove feed from pynewsreader instance
