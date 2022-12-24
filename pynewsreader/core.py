@@ -78,7 +78,7 @@ class PyNewsReader:
                     self._reader.mark_entry_as_read(e)
 
                 feed_title = f"[bold]{self._get_feed_title(e.original_feed_url)}[/bold]"
-                panel_body = f"Title: [bold]{e.title}[/bold]"+"\n"
+                panel_body = f"Title: [bold]{e.title}[/bold]" + "\n"
                 panel_body += str(published_date) + "\n\n"
                 panel_body += strip_html(e.summary).strip() + "\n"
 
@@ -86,7 +86,7 @@ class PyNewsReader:
                     Panel(
                         panel_body,
                         title=feed_title,
-                        subtitle=f"[link={e.link}]{e.link}[/link]"
+                        subtitle=f"[link={e.link}]{e.link}[/link]",
                     )
                 )
                 console.print()
@@ -140,7 +140,7 @@ class PyNewsReader:
         # To delete a tag:
         # r._reader.delete_tag(test[0], "foobar")
         return [i[0] for i in list(self._reader.get_tags(entry))]
-    
+
     def add_feed(self, feed: Feed):
         """Add feed to pynewsreader
 
@@ -201,7 +201,7 @@ class PyNewsReader:
             limit=limit,
         )
 
-    def mark_important(self, entry: reader.Entry):
+    def _mark_important(self, entry: reader.Entry):
         """Mark entry as important
 
         Args:
@@ -209,7 +209,7 @@ class PyNewsReader:
         """
         reader.Reader.mark_entry_as_important(entry)
 
-    def mark_unimportant(self, entry: reader.Entry):
+    def _mark_unimportant(self, entry: reader.Entry):
         """Mark entry as important
 
         Args:
@@ -217,8 +217,8 @@ class PyNewsReader:
         """
         reader.Reader.mark_entry_as_unimportant(entry)
 
-    def tag(self, entry: reader.Entry, tag_key: str, tag_value: Dict = None):
-        """Tag an entry
+    def _add_tag(self, entry: reader.Entry, tag_key: str, tag_value: Dict = None):
+        """Add tag to entry
 
         Args:
             entry (reader.Entry): Entry to tag
@@ -226,14 +226,23 @@ class PyNewsReader:
             tag_value (Dict, optional): Value of tag. Defaults to None.
         """
         reader.Reader.set_tag(entry, tag_key, tag_value)
-        
-    
+
+    def _remove_tag(self, entry: reader.Entry, tag_key: str):
+        """Remove tag from entry
+
+        Args:
+            entry (reader.Entry): Entry to tag
+            tag_key (str): Key of tag
+        """
+        self._reader.delete_tag(entry, tag_key)
 
 # %% ../00_core.ipynb 35
 import fire
 
+
 def main():
     fire.Fire(PyNewsReader)
 
-if __name__ == '__main__':
+
+if __name__ == "__main__":
     main()
