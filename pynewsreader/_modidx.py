@@ -36,4 +36,5 @@ d = { 'settings': { 'branch': 'master',
                                    'pynewsreader.core.PyNewsReader.show': ('core.html#pynewsreader.show', 'pynewsreader/core.py'),
                                    'pynewsreader.core.PyNewsReader.tag': ('core.html#pynewsreader.tag', 'pynewsreader/core.py'),
                                    'pynewsreader.core.PyNewsReader.update': ('core.html#pynewsreader.update', 'pynewsreader/core.py'),
+                                   'pynewsreader.core.main': ('core.html#main', 'pynewsreader/core.py'),
                                    'pynewsreader.core.strip_html': ('core.html#strip_html', 'pynewsreader/core.py')}}}
