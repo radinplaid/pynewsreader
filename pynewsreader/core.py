@@ -175,10 +175,10 @@ class PyNewsReader:
 
     def show(
         self,
-        limit: int = 5,
-        read: bool = None,
+        limit: int = 6,
+        read: bool = False,
         important: bool = None,
-        mark_as_read: bool = False,
+        mark_as_read: bool = True,
     ):
         """Pretty print entries
 
