@@ -43,27 +43,27 @@ class Feed:
 
 # %% ../00_core.ipynb 5
 import rich
-
+import json
 
 class PyNewsReader:
-    def __init__(self, dbpath=None, feeds=List[Feed]):
-        if dbpath is None:
-            logger.info(
-                "Database path not specified, using ~/.cache/pynewsreader/db.sqlite"
-            )
-            self.dbpath = Path().home() / ".cache/pynewsreader"
-            if not self.dbpath.exists():
-                self.dbpath.mkdir(parents=True)
-            self.dbpath = self.dbpath / "db.sqlite"
+    def __init__(self, feeds=List[Feed]):
+        self.dbfolder = Path().home() / ".cache/pynewsreader"
+        if not self.dbfolder.exists():
+            self.dbfolder.mkdir(parents=True)
+        
+        # If custom feed names exist, read them in
+        feed_names_path = self.dbfolder/"feed_names.json"
+        if feed_names_path.exists():
+            with open(self.dbfolder/"feed_names.json", "rt") as myfile:
+                self._feed_names = json.load(myfile)
         else:
-            self.dbpath = dbpath
+            self._feed_names = {}
 
         self._reader = reader.make_reader(
-            self.dbpath, plugins=["reader.enclosure_dedupe", "reader.entry_dedupe"]
+            self.dbfolder/"db.sqlite", plugins=["reader.enclosure_dedupe", "reader.entry_dedupe"]
         )
 
         self._reader.enable_search()
-        self._feed_names = {}
 
     def _print_entries(
         self, entries: List[reader.Entry], mark_as_read: bool = True, limit: int = 10
@@ -143,10 +143,6 @@ class PyNewsReader:
 
     def _get_tags(self, entry: reader.Entry):
         """Get tags for a given entry"""
-        # To set a tag:
-        # r._reader.set_tag(test[0], "foobar")
-        # To delete a tag:
-        # r._reader.delete_tag(test[0], "foobar")
         return [i[0] for i in list(self._reader.get_tags(entry))]
 
     def add_feed(self, feed: Union[Feed, str]):
@@ -162,6 +158,10 @@ class PyNewsReader:
             self._reader.add_feed(feed, exist_ok=True)
         else:
             raise Exception("Must be str or Feed type to add")
+            
+        # Save names to file
+        with open(self.dbfolder/"feed_names.json", "wt") as myfile:
+            json.dump(self._feed_names, myfile)
 
     def remove_feed(self, feed: Feed):
         """Remove feed from pynewsreader instance
