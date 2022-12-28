@@ -4,6 +4,7 @@
 __all__ = ['console', 'logger', 'strip_html', 'Feed', 'PyNewsReader', 'main']
 
 # %% ../00_core.ipynb 3
+from pathlib import Path
 from typing import *
 
 import reader
@@ -47,8 +48,13 @@ import rich
 class PyNewsReader:
     def __init__(self, dbpath=None, feeds=List[Feed]):
         if dbpath is None:
-            logger.info("Database path not specified, using ./db.sqlite")
-            self.dbpath = "db.sqlite"
+            logger.info(
+                "Database path not specified, using ~/.cache/pynewsreader/db.sqlite"
+            )
+            self.dbpath = Path().home() / ".cache/pynewsreader"
+            if not self.dbpath.exists():
+                self.dbpath.mkdir(parents=True)
+            self.dbpath = self.dbpath / "db.sqlite"
         else:
             self.dbpath = dbpath
 
@@ -109,7 +115,7 @@ class PyNewsReader:
         Returns:
             str: Display title
         """
-        if url in self._feed_names:
+        if url in self._feed_names and self._feed_names[url] is not None:
             return self._feed_names[url]
         elif self._reader.get_feed(url).title:
             return self._reader.get_feed(url).title
@@ -156,7 +162,6 @@ class PyNewsReader:
             self._reader.add_feed(feed, exist_ok=True)
         else:
             raise Exception("Must be str or Feed type to add")
-            
 
     def remove_feed(self, feed: Feed):
         """Remove feed from pynewsreader instance
@@ -249,4 +254,3 @@ import fire
 
 def main():
     fire.Fire(PyNewsReader)
-
