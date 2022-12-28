@@ -48,10 +48,12 @@ class PyNewsReader:
     def __init__(self, dbpath=None, feeds=List[Feed]):
         if dbpath is None:
             logger.info("Database path not specified, using ./db.sqlite")
-            dbpath = "db.sqlite"
+            self.dbpath = "db.sqlite"
+        else:
+            self.dbpath = dbpath
 
         self._reader = reader.make_reader(
-            "db.sqlite", plugins=["reader.enclosure_dedupe", "reader.entry_dedupe"]
+            self.dbpath, plugins=["reader.enclosure_dedupe", "reader.entry_dedupe"]
         )
 
         self._reader.enable_search()
@@ -248,6 +250,3 @@ import fire
 def main():
     fire.Fire(PyNewsReader)
 
-
-if __name__ == "__main__":
-    main()
