@@ -4,10 +4,14 @@
 __all__ = ['console', 'logger', 'strip_html', 'Feed', 'PyNewsReader', 'main']
 
 # %% ../00_core.ipynb 3
+import json
+import logging
 from pathlib import Path
 from typing import *
 
+import fire
 import reader
+import rich
 from bs4 import BeautifulSoup
 from rich import print
 from rich.console import Console
@@ -15,7 +19,6 @@ from rich.panel import Panel
 from rich.text import Text
 
 console = Console()
-import logging
 
 logger = logging.getLogger(__name__)
 
@@ -42,11 +45,6 @@ class Feed:
             self.tags.remove(tag)
 
 # %% ../00_core.ipynb 5
-import json
-
-import rich
-
-
 class PyNewsReader:
     def __init__(self, feeds=List[Feed]):
         self.dbfolder = Path().home() / ".cache/pynewsreader"
@@ -110,7 +108,7 @@ class PyNewsReader:
                     self._reader.mark_entry_as_read(e)
 
                 feed_title = f"[bold]{self._get_feed_title(e.original_feed_url)}[/bold]"
-                
+
                 if e.important:
                     panel_body = ":exclamation_mark:"
                 else:
@@ -328,8 +326,5 @@ class PyNewsReader:
         self._reader.delete_tag(entry, tag_key)
 
 # %% ../00_core.ipynb 37
-import fire
-
-
 def main():
     fire.Fire(PyNewsReader)
