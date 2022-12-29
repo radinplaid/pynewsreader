@@ -154,7 +154,7 @@ class PyNewsReader:
             for filter_string in match_strings:
                 if filter_string in i.title:
                     print(f"Marking entry as important: {i.title}")
-                    self._mark_important(i)
+                    self._reader.mark_entry_as_important(i)
 
     def update(self):
         """Update feeds and search"""
