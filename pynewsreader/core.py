@@ -276,21 +276,23 @@ class PyNewsReader:
             limit=limit,
         )
 
-    def _mark_important(self, entry: reader.Entry):
+    def _mark_important(self, entry: reader.Entry = None):
         """Mark entry as important
 
         Args:
             entry (reader.Entry): Entry to mark as important
         """
-        reader.Reader.mark_entry_as_important(entry)
+        if entry is not None:
+            reader.Reader.mark_entry_as_important(entry)
 
-    def _mark_unimportant(self, entry: reader.Entry):
+    def _mark_unimportant(self, entry: reader.Entry = None):
         """Mark entry as important
 
         Args:
             entry (reader.Entry): Entry to mark as important
         """
-        reader.Reader.mark_entry_as_unimportant(entry)
+        if entry is not None:
+            reader.Reader.mark_entry_as_unimportant(entry)
 
     def _add_tag(self, entry: reader.Entry, tag_key: str, tag_value: Dict = None):
         """Add tag to entry
