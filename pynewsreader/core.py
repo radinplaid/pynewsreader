@@ -47,41 +47,41 @@ class Feed:
 # %% ../00_core.ipynb 5
 class PyNewsReader:
     def __init__(self, feeds=List[Feed]):
-        self.dbfolder = Path().home() / ".cache/pynewsreader"
-        if not self.dbfolder.exists():
-            self.dbfolder.mkdir(parents=True)
+        self._dbfolder = Path().home() / ".cache/pynewsreader"
+        if not self._dbfolder.exists():
+            self._dbfolder.mkdir(parents=True)
 
         # If custom feed names exist, read them in
-        feed_names_path = self.dbfolder / "feed_names.json"
+        feed_names_path = self._dbfolder / "feed_names.json"
         if feed_names_path.exists():
-            with open(self.dbfolder / "feed_names.json", "rt") as myfile:
+            with open(self._dbfolder / "feed_names.json", "rt") as myfile:
                 self._feed_names = json.load(myfile)
         else:
             self._feed_names = {}
 
         # If title blacklist exists, read it in
-        title_blacklist_path = self.dbfolder / "title_blacklist.json"
+        title_blacklist_path = self._dbfolder / "title_blacklist.json"
         if title_blacklist_path.exists():
-            with open(self.dbfolder / "title_blacklist.json", "rt") as myfile:
+            with open(self._dbfolder / "title_blacklist.json", "rt") as myfile:
                 self._title_blacklist = json.load(myfile)
         else:
             self._title_blacklist = []
 
         self._reader = reader.make_reader(
-            self.dbfolder / "db.sqlite",
+            self._dbfolder / "db.sqlite",
             plugins=["reader.enclosure_dedupe", "reader.entry_dedupe"],
         )
 
         # If title whitelist exists, read it in
-        title_whitelist_path = self.dbfolder / "title_whitelist.json"
+        title_whitelist_path = self._dbfolder / "title_whitelist.json"
         if title_whitelist_path.exists():
-            with open(self.dbfolder / "title_whitelist.json", "rt") as myfile:
+            with open(self._dbfolder / "title_whitelist.json", "rt") as myfile:
                 self._title_whitelist = json.load(myfile)
         else:
             self._title_whitelist = []
 
         self._reader = reader.make_reader(
-            self.dbfolder / "db.sqlite",
+            self._dbfolder / "db.sqlite",
             plugins=["reader.enclosure_dedupe", "reader.entry_dedupe"],
         )
 
@@ -90,9 +90,7 @@ class PyNewsReader:
     def _print_entries(
         self, entries: List[reader.Entry], mark_as_read: bool = True, limit: int = 10
     ):
-        """
-        Pretty print entries - supports reader.Reader.get_entries arguments
-        """
+        """Pretty print entries - supports reader.Reader.get_entries arguments"""
         displayed_links = set()
         for e in entries:
             if e.link in displayed_links:
@@ -129,19 +127,13 @@ class PyNewsReader:
                 return
 
     def _search_to_entry(self, search_result):
+        """For a given `reader` search result return the corresponding `reader.Entry`"""
         for i in self._reader.get_entries():
             if i.id == search_result.id and i.feed_url == search_result.feed_url:
                 return i
 
     def _get_feed_title(self, url: str):
-        """Get display title for pynewsreader feed
-
-        Args:
-            url (str): URL of pynewsreader feed
-
-        Returns:
-            str: Display title
-        """
+        """Get display title for pynewsreader feed"""
         if url in self._feed_names and self._feed_names[url] is not None:
             return self._feed_names[url]
         elif self._reader.get_feed(url).title:
@@ -163,32 +155,67 @@ class PyNewsReader:
                     print(f"Marking entry as important: {i.title}")
                     self._reader.mark_entry_as_important(i)
 
-    def update(self):
-        """Update feeds and search"""
-        self._reader.update_feeds()
-        self._reader.update_search()
-        if len(self._title_blacklist) > 0:
-            self._mark_matching_entries_as_read(self._title_blacklist)
-        if len(self._title_whitelist) > 0:
-            self._mark_matching_entries_as_important(self._title_whitelist)
-
     def _get_entries(
         self, important: bool = None, read: Union[None, bool] = None, limit: int = 10
     ):
-        """Get entries in reader.Entry format
-
-        Args:
-            read (reader.Entry.read, optional): Filter on `read` status (None, True, False). Defaults to None.
-            limit (int, optional): Number of entries to return. Defaults to 10.
-
-        Returns:
-            List[reader.Entry]: List of entries
-        """
+        """Get entries in reader.Entry format"""
         return self._reader.get_entries(read=read, limit=limit, important=important)
 
     def _get_tags(self, entry: reader.Entry):
         """Get tags for a given entry"""
         return [i[0] for i in list(self._reader.get_tags(entry))]
+
+    def _add_to_blacklist(self, blacklist_string: str):
+        """Add entry to blacklist"""
+        if blacklist_string not in self._title_blacklist:
+            self._title_blacklist.append(blacklist_string)
+            with open(self._dbfolder / "title_blacklist.json", "wt") as myfile:
+                json.dump(self._title_blacklist, myfile)
+
+    def _remove_from_blacklist(self, blacklist_string: str):
+        """Remove entry from blacklist"""
+        if blacklist_string in self._title_blacklist:
+            self._title_blacklist.remove(blacklist_string)
+            with open(self._dbfolder / "title_blacklist.json", "wt") as myfile:
+                json.dump(self._title_blacklist, myfile)
+
+    def _add_to_whitelist(self, whitelist_string: str):
+        """Add entry to whitelist"""
+        if whitelist_string not in self._title_whitelist:
+            self._title_whitelist.append(whitelist_string)
+            with open(self._dbfolder / "title_whitelist.json", "wt") as myfile:
+                json.dump(self._title_whitelist, myfile)
+            for entry in self._get_entries(limit=None):
+                if whitelist_string in entry.title:
+                    self._reader.mark_entry_as_important(entry)
+
+    def _remove_from_whitelist(self, whitelist_string: str):
+        """Remove whitelist entry"""
+        if whitelist_string in self._title_whitelist:
+            self._title_whitelist.remove(whitelist_string)
+            with open(self._dbfolder / "title_whitelist.json", "wt") as myfile:
+                json.dump(self._title_whitelist, myfile)
+            for entry in self._get_entries(limit=None):
+                if whitelist_string in entry.title:
+                    self._reader.mark_entry_as_unimportant(entry)
+
+    def _mark_important(self, entry: reader.Entry = None):
+        """Mark entry as important"""
+        if entry is not None:
+            reader.Reader.mark_entry_as_important(entry)
+
+    def _mark_unimportant(self, entry: reader.Entry = None):
+        """Mark entry as important"""
+        if entry is not None:
+            reader.Reader.mark_entry_as_unimportant(entry)
+
+    def _add_tag(self, entry: reader.Entry, tag_key: str, tag_value: Dict = None):
+        """Add tag to entry"""
+        reader.Reader.set_tag(entry, tag_key, tag_value)
+
+    def _remove_tag(self, entry: reader.Entry, tag_key: str):
+        """Remove tag from entry"""
+        self._reader.delete_tag(entry, tag_key)
 
     def add_feed(self, feed: Union[Feed, str]):
         """Add feed to pynewsreader
@@ -205,7 +232,7 @@ class PyNewsReader:
             raise Exception("Must be str or Feed type to add")
 
         # Save names to file
-        with open(self.dbfolder / "feed_names.json", "wt") as myfile:
+        with open(self._dbfolder / "feed_names.json", "wt") as myfile:
             json.dump(self._feed_names, myfile)
 
     def remove_feed(self, feed: Feed):
@@ -217,36 +244,6 @@ class PyNewsReader:
 
         self._reader.delete_feed(feed.url)
 
-    def _add_to_blacklist(self, blacklist_string: str):
-        if blacklist_string not in self._title_blacklist:
-            self._title_blacklist.append(blacklist_string)
-            with open(self.dbfolder / "title_blacklist.json", "wt") as myfile:
-                json.dump(self._title_blacklist, myfile)
-
-    def _remove_from_blacklist(self, blacklist_string: str):
-        if blacklist_string in self._title_blacklist:
-            self._title_blacklist.remove(blacklist_string)
-            with open(self.dbfolder / "title_blacklist.json", "wt") as myfile:
-                json.dump(self._title_blacklist, myfile)
-
-    def _add_to_whitelist(self, whitelist_string: str):
-        if whitelist_string not in self._title_whitelist:
-            self._title_whitelist.append(whitelist_string)
-            with open(self.dbfolder / "title_whitelist.json", "wt") as myfile:
-                json.dump(self._title_whitelist, myfile)
-            for entry in self._get_entries():
-                if whitelist_string in entry.title:
-                    self._reader.mark_entry_as_important(entry)
-
-    def _remove_from_whitelist(self, whitelist_string: str):
-        if whitelist_string in self._title_whitelist:
-            self._title_whitelist.remove(whitelist_string)
-            with open(self.dbfolder / "title_whitelist.json", "wt") as myfile:
-                json.dump(self._title_whitelist, myfile)
-            for entry in self._get_entries():
-                if whitelist_string in entry.title:
-                    self._reader.mark_entry_as_unimportant(entry)
-
     def feeds(self):
         """List pynewsreader feeds
 
@@ -254,6 +251,15 @@ class PyNewsReader:
             List[str]: List of names of current pynewsreader feeds
         """
         return [self._get_feed_title(i.url) for i in self._reader.get_feeds()]
+
+    def update(self):
+        """Update feeds and search"""
+        self._reader.update_feeds()
+        self._reader.update_search()
+        if len(self._title_blacklist) > 0:
+            self._mark_matching_entries_as_read(self._title_blacklist)
+        if len(self._title_whitelist) > 0:
+            self._mark_matching_entries_as_important(self._title_whitelist)
 
     def show(
         self,
@@ -287,43 +293,6 @@ class PyNewsReader:
             mark_as_read=mark_as_read,
             limit=limit,
         )
-
-    def _mark_important(self, entry: reader.Entry = None):
-        """Mark entry as important
-
-        Args:
-            entry (reader.Entry): Entry to mark as important
-        """
-        if entry is not None:
-            reader.Reader.mark_entry_as_important(entry)
-
-    def _mark_unimportant(self, entry: reader.Entry = None):
-        """Mark entry as important
-
-        Args:
-            entry (reader.Entry): Entry to mark as important
-        """
-        if entry is not None:
-            reader.Reader.mark_entry_as_unimportant(entry)
-
-    def _add_tag(self, entry: reader.Entry, tag_key: str, tag_value: Dict = None):
-        """Add tag to entry
-
-        Args:
-            entry (reader.Entry): Entry to tag
-            tag_key (str): Key of tag
-            tag_value (Dict, optional): Value of tag. Defaults to None.
-        """
-        reader.Reader.set_tag(entry, tag_key, tag_value)
-
-    def _remove_tag(self, entry: reader.Entry, tag_key: str):
-        """Remove tag from entry
-
-        Args:
-            entry (reader.Entry): Entry to tag
-            tag_key (str): Key of tag
-        """
-        self._reader.delete_tag(entry, tag_key)
 
 # %% ../00_core.ipynb 37
 def main():
