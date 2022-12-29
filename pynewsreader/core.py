@@ -58,6 +58,14 @@ class PyNewsReader:
                 self._feed_names = json.load(myfile)
         else:
             self._feed_names = {}
+            
+        # If title blacklist exists, read it in
+        title_blacklist_path = self.dbfolder/"title_blacklist.json"
+        if title_blacklist_path.exists():
+            with open(self.dbfolder/"title_blacklist.json", "rt") as myfile:
+                self._title_blacklist = json.load(myfile)
+        else:
+            self._title_blacklist = []
 
         self._reader = reader.make_reader(
             self.dbfolder/"db.sqlite", plugins=["reader.enclosure_dedupe", "reader.entry_dedupe"]
@@ -121,11 +129,20 @@ class PyNewsReader:
             return self._reader.get_feed(url).title
         else:
             return self._reader.get_feed(url).url
+        
+    def _mark_matching_entries_as_read(self, match_strings:List):
+        for i in self._reader.get_entries(read=False):
+            for filter_string in match_strings:
+                if filter_string in i.title:
+                    print(f"Marking entry as read: {i.title}")
+                    self._reader.mark_entry_as_read(i)
 
     def update(self):
         """Update feeds and search"""
         self._reader.update_feeds()
         self._reader.update_search()
+        if len(self._title_blacklist) > 0:
+            self._mark_matching_entries_as_read(self._title_blacklist)
 
     def _get_entries(
         self, important: bool = None, read: Union[None, bool] = None, limit: int = 10
@@ -171,6 +188,19 @@ class PyNewsReader:
         """
 
         self._reader.delete_feed(feed.url)
+        
+    def add_to_blacklist(self, blacklist_string: str):
+        if blacklist_string not in self._title_blacklist:
+            self._title_blacklist.append(blacklist_string)
+            with open(self.dbfolder/"title_blacklist.json", "wt") as myfile:
+                json.dump(self._title_blacklist, myfile)
+
+    def remove_from_blacklist(self, blacklist_string: str):
+        if blacklist_string in self._title_blacklist:
+            self._title_blacklist.remove(blacklist_string)
+            with open(self.dbfolder/"title_blacklist.json", "wt") as myfile:
+                json.dump(self._title_blacklist, myfile)
+
 
     def feeds(self):
         """List pynewsreader feeds
@@ -248,7 +278,7 @@ class PyNewsReader:
         """
         self._reader.delete_tag(entry, tag_key)
 
-# %% ../00_core.ipynb 35
+# %% ../00_core.ipynb 36
 import fire
 
 
