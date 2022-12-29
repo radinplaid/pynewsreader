@@ -70,6 +70,18 @@ class PyNewsReader:
         self._reader = reader.make_reader(
             self.dbfolder/"db.sqlite", plugins=["reader.enclosure_dedupe", "reader.entry_dedupe"]
         )
+        
+        # If title whitelist exists, read it in
+        title_whitelist_path = self.dbfolder/"title_whitelist.json"
+        if title_whitelist_path.exists():
+            with open(self.dbfolder/"title_whitelist.json", "rt") as myfile:
+                self._title_whitelist = json.load(myfile)
+        else:
+            self._title_whitelist = []
+
+        self._reader = reader.make_reader(
+            self.dbfolder/"db.sqlite", plugins=["reader.enclosure_dedupe", "reader.entry_dedupe"]
+        )
 
         self._reader.enable_search()
 
@@ -137,12 +149,21 @@ class PyNewsReader:
                     print(f"Marking entry as read: {i.title}")
                     self._reader.mark_entry_as_read(i)
 
+    def _mark_matching_entries_as_important(self, match_strings:List):
+        for i in self._reader.get_entries(read=False):
+            for filter_string in match_strings:
+                if filter_string in i.title:
+                    print(f"Marking entry as important: {i.title}")
+                    self._mark_important(i)
+
     def update(self):
         """Update feeds and search"""
         self._reader.update_feeds()
         self._reader.update_search()
         if len(self._title_blacklist) > 0:
             self._mark_matching_entries_as_read(self._title_blacklist)
+        if len(self._title_whitelist) > 0:
+            self._mark_matching_entries_as_important(self._title_whitelist)
 
     def _get_entries(
         self, important: bool = None, read: Union[None, bool] = None, limit: int = 10
@@ -189,19 +210,31 @@ class PyNewsReader:
 
         self._reader.delete_feed(feed.url)
         
-    def add_to_blacklist(self, blacklist_string: str):
+    def _add_to_blacklist(self, blacklist_string: str):
         if blacklist_string not in self._title_blacklist:
             self._title_blacklist.append(blacklist_string)
             with open(self.dbfolder/"title_blacklist.json", "wt") as myfile:
                 json.dump(self._title_blacklist, myfile)
 
-    def remove_from_blacklist(self, blacklist_string: str):
+    def _remove_from_blacklist(self, blacklist_string: str):
         if blacklist_string in self._title_blacklist:
             self._title_blacklist.remove(blacklist_string)
             with open(self.dbfolder/"title_blacklist.json", "wt") as myfile:
                 json.dump(self._title_blacklist, myfile)
 
+    def _add_to_whitelist(self, whitelist_string: str):
+        if whitelist_string not in self._title_whitelist:
+            self._title_whitelist.append(whitelist_string)
+            with open(self.dbfolder/"title_whitelist.json", "wt") as myfile:
+                json.dump(self._title_whitelist, myfile)
 
+    def _remove_from_whitelist(self, whitelist_string: str):
+        if whitelist_string in self._title_whitelist:
+            self._title_whitelist.remove(whitelist_string)
+            with open(self.dbfolder/"title_whitelist.json", "wt") as myfile:
+                json.dump(self._title_whitelist, myfile)
+
+                
     def feeds(self):
         """List pynewsreader feeds
 
@@ -278,7 +311,7 @@ class PyNewsReader:
         """
         self._reader.delete_tag(entry, tag_key)
 
-# %% ../00_core.ipynb 36
+# %% ../00_core.ipynb 39
 import fire
 
 
