@@ -141,6 +141,16 @@ class PyNewsReader:
         else:
             return self._reader.get_feed(url).url
 
+    def _get_entries(
+        self, important: bool = None, read: Union[None, bool] = None, limit: int = 10
+    ):
+        """Get entries in reader.Entry format"""
+        return self._reader.get_entries(read=read, limit=limit, important=important)
+
+    def _get_tags(self, entry: reader.Entry):
+        """Get tags for a given entry"""
+        return [i[0] for i in list(self._reader.get_tags(entry))]
+
     def _mark_matching_entries_as_read(self, match_strings: List):
         for i in self._reader.get_entries(read=False):
             for filter_string in match_strings:
@@ -154,16 +164,6 @@ class PyNewsReader:
                 if filter_string in i.title:
                     print(f"Marking entry as important: {i.title}")
                     self._reader.mark_entry_as_important(i)
-
-    def _get_entries(
-        self, important: bool = None, read: Union[None, bool] = None, limit: int = 10
-    ):
-        """Get entries in reader.Entry format"""
-        return self._reader.get_entries(read=read, limit=limit, important=important)
-
-    def _get_tags(self, entry: reader.Entry):
-        """Get tags for a given entry"""
-        return [i[0] for i in list(self._reader.get_tags(entry))]
 
     def _add_to_blacklist(self, blacklist_string: str):
         """Add entry to blacklist"""
@@ -235,14 +235,19 @@ class PyNewsReader:
         with open(self._dbfolder / "feed_names.json", "wt") as myfile:
             json.dump(self._feed_names, myfile)
 
-    def remove_feed(self, feed: Feed):
+    def remove_feed(self, feed: Union[Feed, str]):
         """Remove feed from pynewsreader instance
 
         Args:
-            feed (Feed): Feed to remove
+            feed (Union[Feed, str]): Feed to remove
         """
 
-        self._reader.delete_feed(feed.url)
+        if isinstance(feed, Feed):
+            self._reader.delete_feed(feed.url)
+        elif isinstance(feed, str):
+            self._reader.delete_feed(feed)
+        else:
+            raise Exception(TypeError)
 
     def feeds(self):
         """List pynewsreader feeds
