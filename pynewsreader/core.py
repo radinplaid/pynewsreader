@@ -157,6 +157,9 @@ class PyNewsReader:
                 if filter_string in i.title:
                     print(f"Marking entry as read: {i.title}")
                     self._reader.mark_entry_as_read(i)
+                if filter_string in i.link:
+                    print(f"Marking entry as read: {i.title}")
+                    self._reader.mark_entry_as_read(i)
 
     def _mark_matching_entries_as_important(self, match_strings: List):
         for i in self._reader.get_entries(read=False):
