@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <link href="https://cdn.jsdelivr.net/npm/@mdi/font@4.x/css/materialdesignicons.min.css" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/vuetify@2.x/dist/vuetify.min.css" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css?family=Roboto:100,300,400,500,700,900" rel="stylesheet">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, minimal-ui">
+  <link rel="shortcut icon" href="{{ url_for('static', filename='favicon.ico') }}">
+</head>
+
+<script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+
+
+<body>
+  <style>
+    .v-card__text,
+    .v-card__title {
+      word-break: normal;
+      /* maybe !important  */
+    }
+  </style>
+  <div id="vm">
+    <v-app>
+      <v-main>
+
+        <template>
+          <div>
+            <v-app-bar color="deep-purple accent-4" dense dark>
+              <v-app-bar-nav-icon></v-app-bar-nav-icon>
+              <v-toolbar-title>Pieces of News</v-toolbar-title>
+              </v-menu>
+            </v-app-bar>
+          </div>
+        </template>
+
+        <template>
+          <v-select v-on:input="filter" v-on:blur="filter" label="Feeds" v-model="category" :items="categories"
+            deletable-chips chips clearable multiple></v-select>
+        </template>
+
+        <template>
+          <v-col cols="12" sm="6" md="4">
+            <v-dialog ref="dialog" v-model="modal" :return-value.sync="dates" persistent width="290px">
+              <template v-slot:activator="{ on, attrs }">
+                <v-text-field v-model="dates" label="Date Range" prepend-icon="mdi-calendar" readonly v-bind="attrs"
+                  v-on="on"></v-text-field>
+              </template>
+              <v-date-picker v-model="dates" scrollable range v-on:change="filter">
+                <v-spacer></v-spacer>
+                <v-btn text color="primary" @click="modal = false">
+                  Cancel
+                </v-btn>
+                <v-btn text color="primary" @click="$refs.dialog.save(dates)">
+                  OK
+                </v-btn>
+              </v-date-picker>
+            </v-dialog>
+          </v-col>
+        </template>
+
+        <template>
+          <v-text-field v-on:change="filter" filled prepend-inner-icon="mdi-magnify" solo name="search"
+            v-model.lazy="search" placeholder="Search"></v-text-field>
+        </template>
+
+        <template>
+          <v-row dense>
+            <v-hover v-for="i in news" v-slot="{ hover }" v-bind:key="i.link">
+              <v-card :href="i.link" target="_blank" class="mx-auto my-2 d-flex flex-column" width="440"
+                :elevation="hover ? 4 : 2" :class="{ 'on-hover': hover }">
+                <v-card-title style="word-break: break-word;">
+                  <v-row>
+                    <v-col md="auto">
+                      <img style="max-width:100px; max-height: 100px;" alt=""
+                        :src="'https://t1.gstatic.com/faviconV2?client=SOCIAL&type=FAVICON&fallback_opts=TYPE,SIZE,URL&size=64&url='+i.source_url">
+                    </v-col>
+                    <v-col>
+                      [[ i.title ]]
+                    </v-col>
+                  </v-row>
+
+  </div>
+  </v-card-title>
+  <v-card-text>
+    <div>
+      [[ i.source_name ]]
+      <!-- <v-btn color="secondary" icon plain x-small @click="source = [[ i.source_name ]]"
+        @click.default="favouriteSource">
+        <v-icon>mdi-thumb-up</v-icon>
+      </v-btn>
+      <v-btn color="secondary" icon plain x-small @click="source = [[ i.source_name ]]" @click.default="ignoreSource">
+        <v-icon>mdi-thumb-down</v-icon>
+      </v-btn> -->
+    </div>
+    <p>
+      [[ i.published ]]
+    </p>
+    <div>
+      [[ i.topic ]]
+    </div>
+  </v-card-text>
+  <v-card-actions class="mt-auto">
+    <v-row>
+      <v-col>
+        <v-btn dark @click="snackbar = true" @click.prevent="greet" text elevation="2" color="red darken-4">
+          <v-icon left>
+            mdi-thumb-down
+          </v-icon>
+          Dismiss
+        </v-btn>
+      </v-col>
+      <v-col class="text-right">
+        <v-btn dark @click="snackbar = true" @click.prevent="greet" text elevation="2" color="green darken-3">
+          <v-icon left>
+            mdi-thumb-up
+          </v-icon>
+          Save
+        </v-btn>
+      </v-col>
+    </v-row>
+  </v-card-actions>
+  </v-card>
+  </v-hover>
+  </v-row>
+  </template>
+
+  <v-snackbar v-model="snackbar">
+    [[ status_text ]]
+    <template v-slot:action="{ attrs }">
+      <v-btn text v-bind="attrs" @click="snackbar = false">
+        Close
+      </v-btn>
+    </template>
+  </v-snackbar>
+
+  </v-app>
+  </div>
+  <script src="https://cdn.jsdelivr.net/npm/vue@2.x/dist/vue.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/vuetify@2.x/dist/vuetify.js"></script>
+  <script src="{{ url_for('static', filename='index.js') }}"></script>
+
+</body>
+
+</html>

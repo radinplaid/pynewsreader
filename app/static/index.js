@@ -1,0 +1,109 @@
+
+const url = "http://localhost:5000/rand";
+
+const vuetify = new Vuetify({
+	icons: {
+		iconfont: 'mdi'
+	}
+})
+
+const vm = new Vue({ // vm is our Vue instance's name for consistency.
+	el: '#vm',
+	vuetify: new Vuetify(),
+	delimiters: ['[[', ']]'],
+	data: () => ({
+		greeting: 'Hello, Vue!',
+		results: [],
+		snackbar: false,
+		status_text: ``,
+		search: null,
+		source: null,
+		show: true,
+		news: null,
+		categories: [],
+		category: [],
+		datemenu: false,
+		dates: ['2022-01-01', new Date().toISOString().slice(0, 10)],
+		menu: false,
+		modal: false,
+		menu2: false,	}),
+	methods: {
+		greet: function (event) {
+			axios.get(url)
+				.then(function (response) {
+					if (response.status == 200) {
+						vm.snackbar = true;
+						vm.status_text = "Success";
+					} else {
+						vm.snackbar = true;
+						vm.status_text = "Failure";
+					}
+				})
+				.catch((error) => {
+					// eslint-disable-next-line
+					console.error(error);
+					vm.snack_failure();
+				});
+		},
+		created() {
+			this.getMessage();
+		},
+		ignoreSource: function (event) {
+			const source = this.source[0][0];
+			axios
+				.get("/ignore_source?source=" + source)
+				.then(function (response) {
+					if (response.status == 200) {
+						vm.snackbar = true;
+						vm.status_text = "Ignored Source: " + source;
+					}
+				})
+				.catch((error) => {
+					// eslint-disable-next-line
+					console.error(error);
+					vm.snack_failure();
+				});
+			event.preventDefault();
+			event.stopPropagation();
+
+		},
+		favouriteSource: function (event) {
+			const source = this.source[0][0];
+			axios
+				.get("/favourite_source?source=" + source)
+				.then(function (response) {
+					if (response.status == 200) {
+						vm.snackbar = true;
+						vm.status_text = "Favourited Source: " + source;
+					}
+				})
+				.catch((error) => {
+					// eslint-disable-next-line
+					console.error(error);
+					vm.snack_failure();
+				});
+			event.preventDefault();
+			event.stopPropagation();
+		},
+		filter() {
+			console.log(this.search);
+			console.log(this.category);
+			console.log(this.dates);
+			axios
+				.get("http://localhost:5000/getnews?search=" + this.search + "&categories=" + this.category + "&min_date=" + this.dates[0] + "&max_date=" + this.dates[1])
+				.then(response => (this.news = response.data))
+		}
+	},
+	mounted() {
+		axios
+			.get("http://localhost:5000/getnews")
+			.then(response => (this.news = response.data));
+		axios
+			.get("http://localhost:5000/feeds")
+			.then(response => (this.categories = response.data));
+		axios
+			.get("http://localhost:5000/feeds")
+			.then(response => (this.category = response.data));
+	}
+
+})
