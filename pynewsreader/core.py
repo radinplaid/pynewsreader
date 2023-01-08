@@ -143,7 +143,7 @@ class PyNewsReader:
 
     def _get_entries(
         self, important: bool = None, read: Union[None, bool] = None, limit: int = 10
-    ):
+    ) -> List[reader.Entry]:
         """Get entries in reader.Entry format"""
         return self._reader.get_entries(read=read, limit=limit, important=important)
 
@@ -302,6 +302,6 @@ class PyNewsReader:
             limit=limit,
         )
 
-# %% ../00_core.ipynb 37
+# %% ../00_core.ipynb 39
 def main():
     fire.Fire(PyNewsReader)
