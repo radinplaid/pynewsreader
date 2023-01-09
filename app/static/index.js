@@ -1,5 +1,5 @@
 
-const url = "http://localhost:5000/rand";
+const url = "/rand";
 
 const vuetify = new Vuetify({
 	icons: {
@@ -91,19 +91,19 @@ const vm = new Vue({ // vm is our Vue instance's name for consistency.
 			console.log(this.category);
 			console.log(this.dates);
 			axios
-				.get("http://localhost:5000/getnews?search=" + this.search + "&unread=" + this.unread_switch+ "&categories=" + this.category + "&min_date=" + this.dates[0] + "&max_date=" + this.dates[1])
+				.get("/getnews?search=" + this.search + "&unread=" + this.unread_switch+ "&categories=" + this.category + "&min_date=" + this.dates[0] + "&max_date=" + this.dates[1])
 				.then(response => (this.news = response.data))
 		}
 	},
 	mounted() {
 		axios
-			.get("http://localhost:5000/getnews")
+			.get("/getnews")
 			.then(response => (this.news = response.data));
 		axios
-			.get("http://localhost:5000/feeds")
+			.get("/feeds")
 			.then(response => (this.categories = response.data));
 		axios
-			.get("http://localhost:5000/feeds")
+			.get("/feeds")
 			.then(response => (this.category = response.data));
 	}
 
