@@ -1,0 +1,893 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.2.313">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+<meta name="description" content="Main codebase for fetching and saving RSS feeds">
+
+<title>pynewsreader - core</title>
+<style>
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: min(4vw, 1.5em);}
+div.column{flex: auto; overflow-x: auto;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1.6em;
+  vertical-align: middle;
+}
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+    color: #aaaaaa;
+  }
+pre.numberSource { margin-left: 3em; border-left: 1px solid #aaaaaa;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+code span.al { color: #ff0000; font-weight: bold; } /* Alert */
+code span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
+code span.at { color: #7d9029; } /* Attribute */
+code span.bn { color: #40a070; } /* BaseN */
+code span.bu { color: #008000; } /* BuiltIn */
+code span.cf { color: #007020; font-weight: bold; } /* ControlFlow */
+code span.ch { color: #4070a0; } /* Char */
+code span.cn { color: #880000; } /* Constant */
+code span.co { color: #60a0b0; font-style: italic; } /* Comment */
+code span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } /* CommentVar */
+code span.do { color: #ba2121; font-style: italic; } /* Documentation */
+code span.dt { color: #902000; } /* DataType */
+code span.dv { color: #40a070; } /* DecVal */
+code span.er { color: #ff0000; font-weight: bold; } /* Error */
+code span.ex { } /* Extension */
+code span.fl { color: #40a070; } /* Float */
+code span.fu { color: #06287e; } /* Function */
+code span.im { color: #008000; font-weight: bold; } /* Import */
+code span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Information */
+code span.kw { color: #007020; font-weight: bold; } /* Keyword */
+code span.op { color: #666666; } /* Operator */
+code span.ot { color: #007020; } /* Other */
+code span.pp { color: #bc7a00; } /* Preprocessor */
+code span.sc { color: #4070a0; } /* SpecialChar */
+code span.ss { color: #bb6688; } /* SpecialString */
+code span.st { color: #4070a0; } /* String */
+code span.va { color: #19177c; } /* Variable */
+code span.vs { color: #4070a0; } /* VerbatimString */
+code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warning */
+</style>
+
+
+<script src="site_libs/quarto-nav/quarto-nav.js"></script>
+<script src="site_libs/quarto-nav/headroom.min.js"></script>
+<script src="site_libs/clipboard/clipboard.min.js"></script>
+<script src="site_libs/quarto-search/autocomplete.umd.js"></script>
+<script src="site_libs/quarto-search/fuse.min.js"></script>
+<script src="site_libs/quarto-search/quarto-search.js"></script>
+<meta name="quarto:offset" content="./">
+<script src="site_libs/quarto-html/quarto.js"></script>
+<script src="site_libs/quarto-html/popper.min.js"></script>
+<script src="site_libs/quarto-html/tippy.umd.min.js"></script>
+<script src="site_libs/quarto-html/anchor.min.js"></script>
+<link href="site_libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="site_libs/quarto-html/quarto-syntax-highlighting.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="site_libs/bootstrap/bootstrap.min.js"></script>
+<link href="site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="site_libs/bootstrap/bootstrap.min.css" rel="stylesheet" id="quarto-bootstrap" data-mode="light">
+<script id="quarto-search-options" type="application/json">{
+  "location": "navbar",
+  "copy-button": false,
+  "collapse-after": 3,
+  "panel-placement": "end",
+  "type": "overlay",
+  "limit": 20,
+  "language": {
+    "search-no-results-text": "No results",
+    "search-matching-documents-text": "matching documents",
+    "search-copy-link-title": "Copy link to search",
+    "search-hide-matches-text": "Hide additional matches",
+    "search-more-match-text": "more match in this document",
+    "search-more-matches-text": "more matches in this document",
+    "search-clear-button-title": "Clear",
+    "search-detached-cancel-button-title": "Cancel",
+    "search-submit-button-title": "Submit"
+  }
+}</script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.6/require.min.js" integrity="sha512-c3Nl8+7g4LMSTdrm621y7kf9v3SDPnhxLNhcjFJbKECVnmZHTdo+IRO05sNLTH/D3vA6u1X32ehoLC7WFVdheg==" crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.5.1/jquery.min.js" integrity="sha512-bLT0Qm9VnAYZDflyKcBaQ2gg0hSYNQrJ8RilYldYQ1FxQYoCLtUjuuRuZo+fjqhx/qtq/1itJ0C2ejDxltZVFg==" crossorigin="anonymous"></script>
+<script type="application/javascript">define('jquery', [],function() {return window.jQuery;})</script>
+
+
+<link rel="stylesheet" href="styles.css">
+<meta property="og:title" content="pynewsreader - core">
+<meta property="og:description" content="Main codebase for fetching and saving RSS feeds">
+<meta property="og:site-name" content="pynewsreader">
+<meta name="twitter:title" content="pynewsreader - core">
+<meta name="twitter:description" content="Main codebase for fetching and saving RSS feeds">
+<meta name="twitter:card" content="summary">
+</head>
+
+<body class="nav-sidebar floating nav-fixed">
+
+<div id="quarto-search-results"></div>
+  <header id="quarto-header" class="headroom fixed-top">
+    <nav class="navbar navbar-expand-lg navbar-dark ">
+      <div class="navbar-container container-fluid">
+      <div class="navbar-brand-container">
+    <a class="navbar-brand" href="./index.html">
+    <span class="navbar-title">pynewsreader</span>
+    </a>
+  </div>
+          <div id="quarto-search" class="" title="Search"></div>
+      </div> <!-- /container-fluid -->
+    </nav>
+  <nav class="quarto-secondary-nav" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+    <div class="container-fluid d-flex justify-content-between">
+      <h1 class="quarto-secondary-nav-title">core</h1>
+      <button type="button" class="quarto-btn-toggle btn" aria-label="Show secondary navigation">
+        <i class="bi bi-chevron-right"></i>
+      </button>
+    </div>
+  </nav>
+</header>
+<!-- content -->
+<div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article page-navbar">
+<!-- sidebar -->
+  <nav id="quarto-sidebar" class="sidebar collapse sidebar-navigation floating overflow-auto">
+    <div class="sidebar-menu-container"> 
+    <ul class="list-unstyled mt-1">
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./index.html" class="sidebar-item-text sidebar-link">pynewsreader</a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./core.html" class="sidebar-item-text sidebar-link active">core</a>
+  </div>
+</li>
+    </ul>
+    </div>
+</nav>
+<!-- margin-sidebar -->
+    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
+        <nav id="TOC" role="doc-toc" class="toc-active">
+    <h2 id="toc-title">On this page</h2>
+   
+  <ul>
+  <li><a href="#strip_html" id="toc-strip_html" class="nav-link active" data-scroll-target="#strip_html">strip_html</a></li>
+  <li><a href="#feed" id="toc-feed" class="nav-link" data-scroll-target="#feed">Feed</a></li>
+  <li><a href="#pynewsreader" id="toc-pynewsreader" class="nav-link" data-scroll-target="#pynewsreader">PyNewsReader</a></li>
+  <li><a href="#add-feeds" id="toc-add-feeds" class="nav-link" data-scroll-target="#add-feeds">Add Feeds</a></li>
+  <li><a href="#update-feeds" id="toc-update-feeds" class="nav-link" data-scroll-target="#update-feeds">Update Feeds</a></li>
+  <li><a href="#list-feeds" id="toc-list-feeds" class="nav-link" data-scroll-target="#list-feeds">List Feeds</a></li>
+  <li><a href="#display-entries" id="toc-display-entries" class="nav-link" data-scroll-target="#display-entries">Display Entries</a></li>
+  <li><a href="#search-entries" id="toc-search-entries" class="nav-link" data-scroll-target="#search-entries">Search Entries</a></li>
+  <li><a href="#tag-entry" id="toc-tag-entry" class="nav-link" data-scroll-target="#tag-entry">Tag Entry</a></li>
+  <li><a href="#remove-tag-from-entry" id="toc-remove-tag-from-entry" class="nav-link" data-scroll-target="#remove-tag-from-entry">Remove tag from entry</a></li>
+  <li><a href="#mark-as-importantunimportant" id="toc-mark-as-importantunimportant" class="nav-link" data-scroll-target="#mark-as-importantunimportant">Mark as Important/Unimportant</a></li>
+  <li><a href="#mark-as-read-unread" id="toc-mark-as-read-unread" class="nav-link" data-scroll-target="#mark-as-read-unread">Mark as Read / Unread</a></li>
+  <li><a href="#automatically-mark-entries-as-read" id="toc-automatically-mark-entries-as-read" class="nav-link" data-scroll-target="#automatically-mark-entries-as-read">Automatically mark entries as read</a></li>
+  <li><a href="#automatically-mark-entries-as-important" id="toc-automatically-mark-entries-as-important" class="nav-link" data-scroll-target="#automatically-mark-entries-as-important">Automatically mark entries as important</a></li>
+  <li><a href="#low-level-access-to-data" id="toc-low-level-access-to-data" class="nav-link" data-scroll-target="#low-level-access-to-data">Low level access to data</a></li>
+  <li><a href="#cli" id="toc-cli" class="nav-link" data-scroll-target="#cli">CLI</a>
+  <ul class="collapse">
+  <li><a href="#main" id="toc-main" class="nav-link" data-scroll-target="#main">main</a></li>
+  </ul></li>
+  </ul>
+<div class="toc-actions"><div><i class="bi bi-github"></i></div><div class="action-links"><p><a href="https://github.com/radinplaid/pynewsreader/issues/new" class="toc-action">Report an issue</a></p></div></div></nav>
+    </div>
+<!-- main -->
+<main class="content" id="quarto-document-content">
+
+<header id="title-block-header" class="quarto-title-block default">
+<div class="quarto-title">
+<h1 class="title d-none d-lg-block">core</h1>
+</div>
+
+<div>
+  <div class="description">
+    Main codebase for fetching and saving RSS feeds
+  </div>
+</div>
+
+
+<div class="quarto-title-meta">
+
+    
+  
+    
+  </div>
+  
+
+</header>
+
+<!-- WARNING: THIS FILE WAS AUTOGENERATED! DO NOT EDIT! -->
+<hr>
+<p><a href="https://github.com/radinplaid/pynewsreader/blob/master/pynewsreader/core.py#L26" target="_blank" style="float:right; font-size:smaller">source</a></p>
+<section id="strip_html" class="level3">
+<h3 class="anchored" data-anchor-id="strip_html">strip_html</h3>
+<blockquote class="blockquote">
+<pre><code> strip_html (s:str)</code></pre>
+</blockquote>
+<hr>
+<p><a href="https://github.com/radinplaid/pynewsreader/blob/master/pynewsreader/core.py#L31" target="_blank" style="float:right; font-size:smaller">source</a></p>
+</section>
+<section id="feed" class="level3">
+<h3 class="anchored" data-anchor-id="feed">Feed</h3>
+<blockquote class="blockquote">
+<pre><code> Feed (url:str, name:str=None, tags:List[str]=[])</code></pre>
+</blockquote>
+<p>RSS feed class</p>
+<hr>
+<p><a href="https://github.com/radinplaid/pynewsreader/blob/master/pynewsreader/core.py#L48" target="_blank" style="float:right; font-size:smaller">source</a></p>
+</section>
+<section id="pynewsreader" class="level3">
+<h3 class="anchored" data-anchor-id="pynewsreader">PyNewsReader</h3>
+<blockquote class="blockquote">
+<pre><code> PyNewsReader (feeds=typing.List[__main__.Feed])</code></pre>
+</blockquote>
+<p>Initialize self. See help(type(self)) for accurate signature.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb4"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>r <span class="op">=</span> PyNewsReader()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+</section>
+<section id="add-feeds" class="level2">
+<h2 class="anchored" data-anchor-id="add-feeds">Add Feeds</h2>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb5"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="co"># With names</span></span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> i <span class="kw">in</span> [</span>
+<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a>    Feed(url<span class="op">=</span><span class="st">"https://ricochet.media/en/feed"</span>, name<span class="op">=</span><span class="st">"Richochet Media"</span>),</span>
+<span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a>    Feed(url<span class="op">=</span><span class="st">"https://thetyee.ca/rss2.xml"</span>, name<span class="op">=</span><span class="st">"The Tyee"</span>),</span>
+<span id="cb5-5"><a href="#cb5-5" aria-hidden="true" tabindex="-1"></a>    Feed(</span>
+<span id="cb5-6"><a href="#cb5-6" aria-hidden="true" tabindex="-1"></a>        url<span class="op">=</span><span class="st">"https://www.thestar.com/content/thestar/feed.RSSManagerServlet.articles.topstories.rss"</span>,</span>
+<span id="cb5-7"><a href="#cb5-7" aria-hidden="true" tabindex="-1"></a>        name<span class="op">=</span><span class="st">"Toronto Star | Top Stories"</span>,</span>
+<span id="cb5-8"><a href="#cb5-8" aria-hidden="true" tabindex="-1"></a>    ),</span>
+<span id="cb5-9"><a href="#cb5-9" aria-hidden="true" tabindex="-1"></a>    Feed(</span>
+<span id="cb5-10"><a href="#cb5-10" aria-hidden="true" tabindex="-1"></a>        url<span class="op">=</span><span class="st">"https://www.thestar.com/content/thestar/feed.RSSManagerServlet.articles.news.investigations.rss"</span>,</span>
+<span id="cb5-11"><a href="#cb5-11" aria-hidden="true" tabindex="-1"></a>        name<span class="op">=</span><span class="st">"Toronto Star | Investigations"</span>,</span>
+<span id="cb5-12"><a href="#cb5-12" aria-hidden="true" tabindex="-1"></a>    ),</span>
+<span id="cb5-13"><a href="#cb5-13" aria-hidden="true" tabindex="-1"></a>    Feed(</span>
+<span id="cb5-14"><a href="#cb5-14" aria-hidden="true" tabindex="-1"></a>        url<span class="op">=</span><span class="st">"https://www.thestar.com/content/thestar/feed.RSSManagerServlet.articles.opinion.editorials.rss"</span>,</span>
+<span id="cb5-15"><a href="#cb5-15" aria-hidden="true" tabindex="-1"></a>        name<span class="op">=</span><span class="st">"Toronto Star | Editorials"</span>,</span>
+<span id="cb5-16"><a href="#cb5-16" aria-hidden="true" tabindex="-1"></a>    ),</span>
+<span id="cb5-17"><a href="#cb5-17" aria-hidden="true" tabindex="-1"></a>    Feed(url<span class="op">=</span><span class="st">"https://www.macleans.ca/feed/"</span>, name<span class="op">=</span><span class="st">"Macleans"</span>),</span>
+<span id="cb5-18"><a href="#cb5-18" aria-hidden="true" tabindex="-1"></a>]:</span>
+<span id="cb5-19"><a href="#cb5-19" aria-hidden="true" tabindex="-1"></a>    r.add_feed(i)</span>
+<span id="cb5-20"><a href="#cb5-20" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-21"><a href="#cb5-21" aria-hidden="true" tabindex="-1"></a><span class="co"># Use the default name from the feed</span></span>
+<span id="cb5-22"><a href="#cb5-22" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> i <span class="kw">in</span> [</span>
+<span id="cb5-23"><a href="#cb5-23" aria-hidden="true" tabindex="-1"></a>    <span class="st">"https://rss.cbc.ca/lineup/topstories.xml"</span>,</span>
+<span id="cb5-24"><a href="#cb5-24" aria-hidden="true" tabindex="-1"></a>    <span class="st">"https://rss.cbc.ca/lineup/world.xml"</span>,</span>
+<span id="cb5-25"><a href="#cb5-25" aria-hidden="true" tabindex="-1"></a>    <span class="st">"https://rss.cbc.ca/lineup/canada.xml"</span>,</span>
+<span id="cb5-26"><a href="#cb5-26" aria-hidden="true" tabindex="-1"></a>    <span class="st">"https://rss.cbc.ca/lineup/business.xml"</span>,</span>
+<span id="cb5-27"><a href="#cb5-27" aria-hidden="true" tabindex="-1"></a>    <span class="st">"https://rss.cbc.ca/lineup/technology.xml"</span>,</span>
+<span id="cb5-28"><a href="#cb5-28" aria-hidden="true" tabindex="-1"></a>    <span class="st">"https://www.cbc.ca/cmlink/rss-canada-ottawa"</span>,</span>
+<span id="cb5-29"><a href="#cb5-29" aria-hidden="true" tabindex="-1"></a>    <span class="st">"https://thenarwhal.ca/feed/"</span>,</span>
+<span id="cb5-30"><a href="#cb5-30" aria-hidden="true" tabindex="-1"></a>    <span class="st">"https://www.theguardian.com/commentisfree/all/rss"</span>,</span>
+<span id="cb5-31"><a href="#cb5-31" aria-hidden="true" tabindex="-1"></a>    <span class="st">"https://www.theguardian.com/science/rss"</span>,</span>
+<span id="cb5-32"><a href="#cb5-32" aria-hidden="true" tabindex="-1"></a>    <span class="st">"https://www.theguardian.com/technology/rss"</span>,</span>
+<span id="cb5-33"><a href="#cb5-33" aria-hidden="true" tabindex="-1"></a>    <span class="st">"https://www.theguardian.com/world/canada/rss"</span>,</span>
+<span id="cb5-34"><a href="#cb5-34" aria-hidden="true" tabindex="-1"></a>]:</span>
+<span id="cb5-35"><a href="#cb5-35" aria-hidden="true" tabindex="-1"></a>    r.add_feed(Feed(i))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+</section>
+<section id="update-feeds" class="level2">
+<h2 class="anchored" data-anchor-id="update-feeds">Update Feeds</h2>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb6"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a>r.update()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display">
+<pre style="white-space:pre;overflow-x:auto;line-height:normal;font-family:Menlo,'DejaVu Sans Mono',consolas,'Courier New',monospace">Marking entry as read: Harry Kane provides knockout blow and edges closer to Tottenham goal record
+</pre>
+</div>
+<div class="cell-output cell-output-display">
+<pre style="white-space:pre;overflow-x:auto;line-height:normal;font-family:Menlo,'DejaVu Sans Mono',consolas,'Courier New',monospace">Marking entry as read: FA Cup third round: Chesterfield v West Brom, Hull v Fulham and more – live
+</pre>
+</div>
+<div class="cell-output cell-output-display">
+<pre style="white-space:pre;overflow-x:auto;line-height:normal;font-family:Menlo,'DejaVu Sans Mono',consolas,'Courier New',monospace">Marking entry as read: FA investigates alleged homophobic chanting aimed at Frank Lampard
+</pre>
+</div>
+<div class="cell-output cell-output-display">
+<pre style="white-space:pre;overflow-x:auto;line-height:normal;font-family:Menlo,'DejaVu Sans Mono',consolas,'Courier New',monospace">Marking entry as read: How Elon Musk, Sam Bankman-Fried and the Liver King taught us a powerful lesson in business 
+— and in life
+</pre>
+</div>
+<div class="cell-output cell-output-display">
+<pre style="white-space:pre;overflow-x:auto;line-height:normal;font-family:Menlo,'DejaVu Sans Mono',consolas,'Courier New',monospace">Marking entry as read: Zero-sum game: Netflix’s Break Point aces the loneliness of top-flight tennis
+</pre>
+</div>
+<div class="cell-output cell-output-display">
+<pre style="white-space:pre;overflow-x:auto;line-height:normal;font-family:Menlo,'DejaVu Sans Mono',consolas,'Courier New',monospace">Marking entry as read: Whenever I think about Luca I can’t help smiling. He was a true gentleman | Jon Harley
+</pre>
+</div>
+<div class="cell-output cell-output-display">
+<pre style="white-space:pre;overflow-x:auto;line-height:normal;font-family:Menlo,'DejaVu Sans Mono',consolas,'Courier New',monospace">Marking entry as read: ‘General’ Franks adds another chapter to English success story in Pakistan
+</pre>
+</div>
+<div class="cell-output cell-output-display">
+<pre style="white-space:pre;overflow-x:auto;line-height:normal;font-family:Menlo,'DejaVu Sans Mono',consolas,'Courier New',monospace">Marking entry as read: ‘I had a kickabout with him’: our readers remember meeting Pelé
+</pre>
+</div>
+<div class="cell-output cell-output-display">
+<pre style="white-space:pre;overflow-x:auto;line-height:normal;font-family:Menlo,'DejaVu Sans Mono',consolas,'Courier New',monospace">Marking entry as read: Australia fire after the rain as Pat Cummins leads charge towards win
+</pre>
+</div>
+<div class="cell-output cell-output-display">
+<pre style="white-space:pre;overflow-x:auto;line-height:normal;font-family:Menlo,'DejaVu Sans Mono',consolas,'Courier New',monospace">Marking entry as read: No miracle comeback this time for Raptors against Knicks
+</pre>
+</div>
+<div class="cell-output cell-output-display">
+<pre style="white-space:pre;overflow-x:auto;line-height:normal;font-family:Menlo,'DejaVu Sans Mono',consolas,'Courier New',monospace">Marking entry as read: Eddie Jones: ‘The mistakes I made with England – and why I got the sack’
+</pre>
+</div>
+<div class="cell-output cell-output-display">
+<pre style="white-space:pre;overflow-x:auto;line-height:normal;font-family:Menlo,'DejaVu Sans Mono',consolas,'Courier New',monospace">Marking entry as read: Cristiano Ronaldo lands at Al Nassr, the next leg in football’s flight from reality | Barney
+Ronay
+</pre>
+</div>
+<div class="cell-output cell-output-display">
+<pre style="white-space:pre;overflow-x:auto;line-height:normal;font-family:Menlo,'DejaVu Sans Mono',consolas,'Courier New',monospace">Marking entry as read: Gianluca Vialli: a look back at the Italy great's football life – video obituary
+</pre>
+</div>
+<div class="cell-output cell-output-display">
+<pre style="white-space:pre;overflow-x:auto;line-height:normal;font-family:Menlo,'DejaVu Sans Mono',consolas,'Courier New',monospace">Marking entry as read: Gianluca Vialli – a life in pictures
+</pre>
+</div>
+</div>
+</section>
+<section id="list-feeds" class="level2">
+<h2 class="anchored" data-anchor-id="list-feeds">List Feeds</h2>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb7"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a>r.feeds()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display">
+<pre><code>['Richochet Media',
+ 'Canada | The Guardian',
+ 'CBC | Business News',
+ 'CBC | Canada News',
+ 'CBC | Ottawa News',
+ 'CBC | Technology News',
+ 'CBC | Top Stories News',
+ 'CBC | World News',
+ 'Macleans',
+ 'Science | The Guardian',
+ 'Technology | The Guardian',
+ 'The Guardian',
+ 'The Narwhal',
+ 'The Tyee',
+ 'Toronto Star | Investigations',
+ 'Toronto Star | Editorials',
+ 'Toronto Star | Top Stories']</code></pre>
+</div>
+</div>
+</section>
+<section id="display-entries" class="level2">
+<h2 class="anchored" data-anchor-id="display-entries">Display Entries</h2>
+<p><code>read</code> = None shows all entries</p>
+<p><code>read</code> = False shows only unread entries</p>
+<p><code>read</code> = True shows only read entries</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb9"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a>r.show(limit<span class="op">=</span><span class="dv">5</span>, read<span class="op">=</span><span class="va">None</span>, mark_as_read<span class="op">=</span><span class="va">False</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display">
+<pre style="white-space:pre;overflow-x:auto;line-height:normal;font-family:Menlo,'DejaVu Sans Mono',consolas,'Courier New',monospace">╭─────────────────────────────────────────────────── <span style="font-weight: bold">The Tyee</span> ────────────────────────────────────────────────────╮
+│ Title: <span style="font-weight: bold">Glen Clark Is Open to Running BC Housing (in News)</span>                                                       │
+│ Date: Unknown                                                                                                   │
+│                                                                                                                 │
+│ The former premier left the private sector this week and says he’s offered to help David Eby’s government.      │
+│                                                                                                                 │
+╰────────────── <a href="https://thetyee.ca/News/2023/01/06/Glen-Clark-Open-BC-Housing-David-Eby-Government/" target="_blank">https://thetyee.ca/News/2023/01/06/Glen-Clark-Open-BC-Housing-David-Eby-Government/</a> ──────────────╯
+</pre>
+</div>
+<div class="cell-output cell-output-display">
+<pre style="white-space:pre;overflow-x:auto;line-height:normal;font-family:Menlo,'DejaVu Sans Mono',consolas,'Courier New',monospace"></pre>
+</div>
+<div class="cell-output cell-output-display">
+<pre style="white-space:pre;overflow-x:auto;line-height:normal;font-family:Menlo,'DejaVu Sans Mono',consolas,'Courier New',monospace">╭─────────────────────────────────────────────────── <span style="font-weight: bold">The Tyee</span> ────────────────────────────────────────────────────╮
+│ Title: <span style="font-weight: bold">What Canadian Cities Can Learn from My 'Intense' Mumbai Neighbourhood (in Opinion)</span>                       │
+│ Date: Unknown                                                                                                   │
+│                                                                                                                 │
+│ Diversity, connection and a car-free life come when all the things you need, from fresh meals to doctors, are   │
+│ steps away from your home.                                                                                      │
+│                                                                                                                 │
+╰─────────── <a href="https://thetyee.ca/Opinion/2023/01/06/Canadian-Cities-Learn-Intense-Mumbai-Neighbourhood/" target="_blank">https://thetyee.ca/Opinion/2023/01/06/Canadian-Cities-Learn-Intense-Mumbai-Neighbourhood/</a> ───────────╯
+</pre>
+</div>
+<div class="cell-output cell-output-display">
+<pre style="white-space:pre;overflow-x:auto;line-height:normal;font-family:Menlo,'DejaVu Sans Mono',consolas,'Courier New',monospace"></pre>
+</div>
+<div class="cell-output cell-output-display">
+<pre style="white-space:pre;overflow-x:auto;line-height:normal;font-family:Menlo,'DejaVu Sans Mono',consolas,'Courier New',monospace">╭─────────────────────────────────────────────────── <span style="font-weight: bold">The Tyee</span> ────────────────────────────────────────────────────╮
+│ Title: <span style="font-weight: bold">BC Labour Board Rules Workers Can’t Refuse to Cross Some Picket Lines (in News)</span>                          │
+│ Date: Unknown                                                                                                   │
+│                                                                                                                 │
+│ The precedent-setting decision affects strikes by federally regulated employees in the province.                │
+│                                                                                                                 │
+╰───────────── <a href="https://thetyee.ca/News/2023/01/06/BC-Labour-Board-Rules-Workers-Refuse-Picket-Lines/" target="_blank">https://thetyee.ca/News/2023/01/06/BC-Labour-Board-Rules-Workers-Refuse-Picket-Lines/</a> ─────────────╯
+</pre>
+</div>
+<div class="cell-output cell-output-display">
+<pre style="white-space:pre;overflow-x:auto;line-height:normal;font-family:Menlo,'DejaVu Sans Mono',consolas,'Courier New',monospace"></pre>
+</div>
+<div class="cell-output cell-output-display">
+<pre style="white-space:pre;overflow-x:auto;line-height:normal;font-family:Menlo,'DejaVu Sans Mono',consolas,'Courier New',monospace">╭─────────────────────────────────────────────────── <span style="font-weight: bold">The Tyee</span> ────────────────────────────────────────────────────╮
+│ Title: <span style="font-weight: bold">Telus Health Gets More Time in Extra-Billing Case (in News)</span>                                              │
+│ Date: Unknown                                                                                                   │
+│                                                                                                                 │
+│ The province is seeking an injunction to stop the corporation from charging patients for access to primary      │
+│ care.                                                                                                           │
+│                                                                                                                 │
+╰────────────────────── <a href="https://thetyee.ca/News/2023/01/06/Telus-Health-Extra-Billing-Case/" target="_blank">https://thetyee.ca/News/2023/01/06/Telus-Health-Extra-Billing-Case/</a> ──────────────────────╯
+</pre>
+</div>
+<div class="cell-output cell-output-display">
+<pre style="white-space:pre;overflow-x:auto;line-height:normal;font-family:Menlo,'DejaVu Sans Mono',consolas,'Courier New',monospace"></pre>
+</div>
+<div class="cell-output cell-output-display">
+<pre style="white-space:pre;overflow-x:auto;line-height:normal;font-family:Menlo,'DejaVu Sans Mono',consolas,'Courier New',monospace">╭─────────────────────────────────────────────────── <span style="font-weight: bold">The Tyee</span> ────────────────────────────────────────────────────╮
+│ Title: <span style="font-weight: bold">What Canada Needs to Understand about Albertans (in Analysis)</span>                                            │
+│ Date: Unknown                                                                                                   │
+│                                                                                                                 │
+│ Behind our charged politics are valid resentments. Here’s how we can have a productive conversation.            │
+│                                                                                                                 │
+╰──────────────── <a href="https://thetyee.ca/Analysis/2023/01/05/What-Canada-Needs-Understand-Albertans/" target="_blank">https://thetyee.ca/Analysis/2023/01/05/What-Canada-Needs-Understand-Albertans/</a> ─────────────────╯
+</pre>
+</div>
+<div class="cell-output cell-output-display">
+<pre style="white-space:pre;overflow-x:auto;line-height:normal;font-family:Menlo,'DejaVu Sans Mono',consolas,'Courier New',monospace"></pre>
+</div>
+</div>
+</section>
+<section id="search-entries" class="level2">
+<h2 class="anchored" data-anchor-id="search-entries">Search Entries</h2>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb10"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a>r.search(<span class="st">"rate"</span>, mark_as_read<span class="op">=</span><span class="va">False</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display">
+<pre style="white-space:pre;overflow-x:auto;line-height:normal;font-family:Menlo,'DejaVu Sans Mono',consolas,'Courier New',monospace">╭────────────────────────────────────────────── <span style="font-weight: bold">CBC | Business News</span> ──────────────────────────────────────────────╮
+│ Title: <span style="font-weight: bold">High office vacancy rates spell continuing trouble for shops dependent on worker foot traffic</span>            │
+│ Date: 2022-12-22                                                                                                │
+│                                                                                                                 │
+│ Businesses that depend on the flow of office workers are struggling as vacancy rates in office towers across    │
+│ Canada continue to rise.&nbsp;Vancouver's office tower vacancy rate has tripled since 2019, while Montreal's has     │
+│ doubled.                                                                                                        │
+│                                                                                                                 │
+╰────────── <a href="https://www.cbc.ca/news/business/office-vacancy-rates-businesses-struggle-1.6692360?cmp=rss" target="_blank">https://www.cbc.ca/news/business/office-vacancy-rates-businesses-struggle-1.6692360?cmp=rss</a> ──────────╯
+</pre>
+</div>
+<div class="cell-output cell-output-display">
+<pre style="white-space:pre;overflow-x:auto;line-height:normal;font-family:Menlo,'DejaVu Sans Mono',consolas,'Courier New',monospace"></pre>
+</div>
+<div class="cell-output cell-output-display">
+<pre style="white-space:pre;overflow-x:auto;line-height:normal;font-family:Menlo,'DejaVu Sans Mono',consolas,'Courier New',monospace">╭────────────────────────────────────────────── <span style="font-weight: bold">CBC | Business News</span> ──────────────────────────────────────────────╮
+│ Title: <span style="font-weight: bold">Official inflation rate cools to 6.8% — but just about everything except gasoline keeps getting more </span>    │
+│ <span style="font-weight: bold">expensive</span>                                                                                                       │
+│ Date: 2022-12-21                                                                                                │
+│                                                                                                                 │
+│ Canada's inflation rate cooled to 6.8 per cent last month as prices for gasoline and furniture went down, but   │
+│ the cost of food and rent went up.                                                                              │
+│                                                                                                                 │
+╰────────────────────── <a href="https://www.cbc.ca/news/business/inflation-canada-1.6693441?cmp=rss" target="_blank">https://www.cbc.ca/news/business/inflation-canada-1.6693441?cmp=rss</a> ──────────────────────╯
+</pre>
+</div>
+<div class="cell-output cell-output-display">
+<pre style="white-space:pre;overflow-x:auto;line-height:normal;font-family:Menlo,'DejaVu Sans Mono',consolas,'Courier New',monospace"></pre>
+</div>
+<div class="cell-output cell-output-display">
+<pre style="white-space:pre;overflow-x:auto;line-height:normal;font-family:Menlo,'DejaVu Sans Mono',consolas,'Courier New',monospace">╭────────────────────────────────────────── <span style="font-weight: bold">Toronto Star | Top Stories</span> ───────────────────────────────────────────╮
+│ Title: <span style="font-weight: bold">‘It’s choking me’: This homeowner’s mortgage payments have shot up by more than $1,000 a month. What </span>    │
+│ <span style="font-weight: bold">should he do?</span>                                                                                                   │
+│ Date: 2022-12-30                                                                                                │
+│                                                                                                                 │
+│ ‘I was naive. I’ve never experienced rate hikes like this before,’ homeowner says, adding he plans to switch to │
+│ a five-year fixed rate.                                                                                         │
+│                                                                                                                 │
+╰─ <a href="https://www.thestar.com/business/personal_finance/2022/12/30/the-last-thing-you-want-to-do-it-sell-your-home-as-variable-mortgages-rates-go-up-cutting-back-significantly-on-expenses-is-required-short-term-experts-say.html" target="_blank">https://www.thestar.com/business/personal_finance/2022/12/30/the-last-thing-you-want-to-do-it-sell-your-home-a</a>─╯
+</pre>
+</div>
+<div class="cell-output cell-output-display">
+<pre style="white-space:pre;overflow-x:auto;line-height:normal;font-family:Menlo,'DejaVu Sans Mono',consolas,'Courier New',monospace"></pre>
+</div>
+<div class="cell-output cell-output-display">
+<pre style="white-space:pre;overflow-x:auto;line-height:normal;font-family:Menlo,'DejaVu Sans Mono',consolas,'Courier New',monospace">╭────────────────────────────────────────────── <span style="font-weight: bold">CBC | Business News</span> ──────────────────────────────────────────────╮
+│ Title: <span style="font-weight: bold">Canada's economy added 104,000 jobs in December, blowing well past expectations</span>                          │
+│ Date: 2023-01-06                                                                                                │
+│                                                                                                                 │
+│ Canada's economy&nbsp;added&nbsp;104,000&nbsp;jobs in December as the unemployment rate fell slightly to 5.0 per cent,         │
+│ Statistics Canada said Friday. But the gain wasn't reflected in working hours, and a hot labour market could    │
+│ mean another rate hike from the central bank in January.                                                        │
+│                                                                                                                 │
+╰──────────────────── <a href="https://www.cbc.ca/news/business/canada-jobs-december-1.6705569?cmp=rss" target="_blank">https://www.cbc.ca/news/business/canada-jobs-december-1.6705569?cmp=rss</a> ────────────────────╯
+</pre>
+</div>
+<div class="cell-output cell-output-display">
+<pre style="white-space:pre;overflow-x:auto;line-height:normal;font-family:Menlo,'DejaVu Sans Mono',consolas,'Courier New',monospace"></pre>
+</div>
+<div class="cell-output cell-output-display">
+
+<pre style="white-space:pre;overflow-x:auto;line-height:normal;font-family:Menlo,'DejaVu Sans Mono',consolas,'Courier New',monospace">╭───────────────────────────────────────────────── <span style="font-weight: bold">The Guardian</span> ──────────────────────────────────────────────────╮
+│ Title: <span style="font-weight: bold">We are ignoring Covid case rises once again | Letters</span>                                                    │
+│ Date: 2022-12-29                                                                                                │
+│                                                                                                                 │
+│ The decision to stop reporting the Covid growth rate is the latest in a series of attempts to limit the         │
+│ available information about the current spread, writes Dr Brian Ramsden, while Susan Treagus has been keeping a │
+│ Covid diaryWith a predictable adherence to the principle of burying bad news, the government’s UK Health        │
+│ Security Agency announced on the Friday before Christmas that it is now ceasing to publish the reproduction     │
+│ number – the R value – and the growth rate for Covid-19 in the UK (UK to stop publishing Covid modelling data,  │
+│ 25 December).This decision was taken at a time when the R value and the growth rate both show that the          │
+│ prevalence of Covid is increasing in the UK. This is just the latest in a series of attempts to minimise the    │
+│ availability of information about Covid. Data about tests is virtually nonexistent, because tests are no longer │
+│ freely available; contact tracing has ceased; and daily reporting of infections stopped when people were told   │
+│ there was no longer a need to use masks or to self-isolate. Continue reading...                                 │
+│                                                                                                                 │
+╰─────────── <a href="https://www.theguardian.com/world/2022/dec/29/we-are-ignoring-covid-case-rises-once-again" target="_blank">https://www.theguardian.com/world/2022/dec/29/we-are-ignoring-covid-case-rises-once-again</a> ───────────╯
+</pre>
+</div>
+<div class="cell-output cell-output-display">
+<pre style="white-space:pre;overflow-x:auto;line-height:normal;font-family:Menlo,'DejaVu Sans Mono',consolas,'Courier New',monospace"></pre>
+</div>
+<div class="cell-output cell-output-display">
+<pre style="white-space:pre;overflow-x:auto;line-height:normal;font-family:Menlo,'DejaVu Sans Mono',consolas,'Courier New',monospace">╭───────────────────────────────────────────────── <span style="font-weight: bold">The Guardian</span> ──────────────────────────────────────────────────╮
+│ Title: <span style="font-weight: bold">Inflation, tech plunge and ‘crypto winter’: global stock markets in 2022</span>                                 │
+│ Date: 2022-12-30                                                                                                │
+│                                                                                                                 │
+│ Shares tumble and government bonds hammered by central banks’ interest rate risesFTSE 100 ends 2022 slightly up │
+│ despite global turmoilInvestors are reeling from the worst year in global financial markets since the 2008      │
+│ financial crisis, as inflation forced central banks around the world to raise interest rates and put an end to  │
+│ the supply of cheap money that has fuelled a golden decade for investors.Global stocks have lost about a fifth  │
+│ of their value during the last year, as the “everything bubble” that inflated during the Covid-19 pandemic      │
+│ burst, sending tech shares and crypto assets tumbling. Continue reading...                                      │
+│                                                                                                                 │
+╰─ <a href="https://www.theguardian.com/business/2022/dec/30/inflation-tech-plunge-crypto-global-stock-markets-2022-shares-bonds-interest-rates" target="_blank">https://www.theguardian.com/business/2022/dec/30/inflation-tech-plunge-crypto-global-stock-markets-2022-shares</a>─╯
+</pre>
+</div>
+<div class="cell-output cell-output-display">
+<pre style="white-space:pre;overflow-x:auto;line-height:normal;font-family:Menlo,'DejaVu Sans Mono',consolas,'Courier New',monospace"></pre>
+</div>
+<div class="cell-output cell-output-display">
+<pre style="white-space:pre;overflow-x:auto;line-height:normal;font-family:Menlo,'DejaVu Sans Mono',consolas,'Courier New',monospace">╭───────────────────────────────────────── <span style="font-weight: bold">Toronto Star | Investigations</span> ─────────────────────────────────────────╮
+│ Title: <span style="font-weight: bold">Toronto parents less likely to see reduced daycare fees than almost anywhere else in Ontario</span>             │
+│ Date: 2022-12-22                                                                                                │
+│                                                                                                                 │
+│ For-profit daycares opted out of $10/day child care program at much higher rate than non-profits, a Star        │
+│ analysis found.                                                                                                 │
+│                                                                                                                 │
+╰─ <a href="https://www.thestar.com/news/investigations/2022/12/22/toronto-parents-less-likely-to-see-reduced-daycare-fees-than-almost-anywhere-else-in-ontario.html" target="_blank">https://www.thestar.com/news/investigations/2022/12/22/toronto-parents-less-likely-to-see-reduced-daycare-fees</a>─╯
+</pre>
+</div>
+<div class="cell-output cell-output-display">
+<pre style="white-space:pre;overflow-x:auto;line-height:normal;font-family:Menlo,'DejaVu Sans Mono',consolas,'Courier New',monospace"></pre>
+</div>
+<div class="cell-output cell-output-display">
+<pre style="white-space:pre;overflow-x:auto;line-height:normal;font-family:Menlo,'DejaVu Sans Mono',consolas,'Courier New',monospace">╭───────────────────────────────────────────────── <span style="font-weight: bold">The Guardian</span> ──────────────────────────────────────────────────╮
+│ Title: <span style="font-weight: bold">UK inflation will fall in 2023 but energy bills and taxes will rise as house prices drop. Happy new year</span> │
+│ <span style="font-weight: bold">| Larry Elliott</span>                                                                                                 │
+│ Date: 2023-01-01                                                                                                │
+│                                                                                                                 │
+│ Britain’s recession, however, will be relatively mild, although such forecasting is a mug’s gameWar in Europe.  │
+│ Political turmoil. A stagnant economy. Soaring energy bills. The highest inflation rate in more than four       │
+│ decades. Higher interest rates. That was the story of 2022. Truly, the year just gone was – in the words of the │
+│ late queen – an annus horribilis.So 2023 will have to go some to match its predecessor for drama. The bookies   │
+│ would, for example, give you relatively long odds on it being another year of three prime ministers and four    │
+│ chancellors of the exchequer. Continue reading...                                                               │
+│                                                                                                                 │
+╰─ <a href="https://www.theguardian.com/business/2023/jan/01/uk-inflation-energy-bills-taxes-house-prices-happy-new-year" target="_blank">https://www.theguardian.com/business/2023/jan/01/uk-inflation-energy-bills-taxes-house-prices-happy-new-year</a> ──╯
+</pre>
+</div>
+<div class="cell-output cell-output-display">
+<pre style="white-space:pre;overflow-x:auto;line-height:normal;font-family:Menlo,'DejaVu Sans Mono',consolas,'Courier New',monospace"></pre>
+</div>
+<div class="cell-output cell-output-display">
+<pre style="white-space:pre;overflow-x:auto;line-height:normal;font-family:Menlo,'DejaVu Sans Mono',consolas,'Courier New',monospace">╭──────────────────────────────────────────── <span style="font-weight: bold">Science | The Guardian</span> ─────────────────────────────────────────────╮
+│ Title: <span style="font-weight: bold">UK to stop publishing Covid modelling data</span>                                                               │
+│ Date: 2022-12-25                                                                                                │
+│                                                                                                                 │
+│ R range and growth rate, which during the height of the pandemic was published weekly in England, deemed ‘no    │
+│ longer necessary’The UK Health Security Agency will stop publishing modelling data on coronavirus in early      │
+│ January.The chief data scientist, Dr Nick Watkins, said the publication of this specific data is “no longer     │
+│ necessary” as the country is living with Covid thanks to vaccines and therapeutics. Continue reading...         │
+│                                                                                                                 │
+╰─────────── <a href="https://www.theguardian.com/world/2022/dec/25/uk-to-stop-publishing-covid-modelling-data" target="_blank">https://www.theguardian.com/world/2022/dec/25/uk-to-stop-publishing-covid-modelling-data</a> ────────────╯
+</pre>
+</div>
+<div class="cell-output cell-output-display">
+<pre style="white-space:pre;overflow-x:auto;line-height:normal;font-family:Menlo,'DejaVu Sans Mono',consolas,'Courier New',monospace"></pre>
+</div>
+<div class="cell-output cell-output-display">
+<pre style="white-space:pre;overflow-x:auto;line-height:normal;font-family:Menlo,'DejaVu Sans Mono',consolas,'Courier New',monospace">╭───────────────────────────────────────────────── <span style="font-weight: bold">The Guardian</span> ──────────────────────────────────────────────────╮
+│ Title: <span style="font-weight: bold">‘Groundhog year’: UK disposable incomes to fall by 3.8% in 2023</span>                                          │
+│ Date: 2022-12-30                                                                                                │
+│                                                                                                                 │
+│ The Resolution Foundation thinktank forecasts a drop in living standards for a second year as the cost of       │
+│ living crisis deepensHouseholds are facing a “groundhog year” in 2023, as soaring gas bills and planned tax     │
+│ rises squeeze disposable incomes and send living standards tumbling for the second year running.Higher mortgage │
+│ costs as fixed-rate loans come to an end and new deals are negotiated will add to the financial burden already  │
+│ felt by millions of households reeling from the worst fall in living standards in a century. Continue           │
+│ reading...                                                                                                      │
+│                                                                                                                 │
+╰── <a href="https://www.theguardian.com/business/2022/dec/30/groundhog-year-uk-disposable-incomes-to-fall-by-38-in-2023" target="_blank">https://www.theguardian.com/business/2022/dec/30/groundhog-year-uk-disposable-incomes-to-fall-by-38-in-2023</a> ──╯
+</pre>
+</div>
+<div class="cell-output cell-output-display">
+<pre style="white-space:pre;overflow-x:auto;line-height:normal;font-family:Menlo,'DejaVu Sans Mono',consolas,'Courier New',monospace"></pre>
+</div>
+</div>
+</section>
+<section id="tag-entry" class="level2">
+<h2 class="anchored" data-anchor-id="tag-entry">Tag Entry</h2>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb11"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a>test <span class="op">=</span> <span class="bu">list</span>(r._reader.get_entries())</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb12"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a>r._reader.set_tag(test[<span class="dv">0</span>], <span class="st">"foobar"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb13"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a><span class="bu">list</span>(r._reader.get_tags(test[<span class="dv">0</span>]))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display">
+<pre><code>[('foobar', None)]</code></pre>
+</div>
+</div>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb15"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a><span class="co"># We added a method to just return the tag key:</span></span>
+<span id="cb15-2"><a href="#cb15-2" aria-hidden="true" tabindex="-1"></a>r._get_tags(test[<span class="dv">0</span>])</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display">
+<pre><code>['foobar']</code></pre>
+</div>
+</div>
+</section>
+<section id="remove-tag-from-entry" class="level2">
+<h2 class="anchored" data-anchor-id="remove-tag-from-entry">Remove tag from entry</h2>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb17"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a>r._reader.delete_tag(test[<span class="dv">0</span>], <span class="st">"foobar"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb18"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb18-1"><a href="#cb18-1" aria-hidden="true" tabindex="-1"></a><span class="bu">list</span>(r._get_tags(test[<span class="dv">0</span>]))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display">
+<pre><code>[]</code></pre>
+</div>
+</div>
+</section>
+<section id="mark-as-importantunimportant" class="level2">
+<h2 class="anchored" data-anchor-id="mark-as-importantunimportant">Mark as Important/Unimportant</h2>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb20"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb20-1"><a href="#cb20-1" aria-hidden="true" tabindex="-1"></a>r._reader.mark_entry_as_important(test[<span class="dv">0</span>])</span>
+<span id="cb20-2"><a href="#cb20-2" aria-hidden="true" tabindex="-1"></a>r._reader.mark_entry_as_unimportant(test[<span class="dv">0</span>])</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+</section>
+<section id="mark-as-read-unread" class="level2">
+<h2 class="anchored" data-anchor-id="mark-as-read-unread">Mark as Read / Unread</h2>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb21"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb21-1"><a href="#cb21-1" aria-hidden="true" tabindex="-1"></a>r._reader.mark_entry_as_read(test[<span class="dv">0</span>])</span>
+<span id="cb21-2"><a href="#cb21-2" aria-hidden="true" tabindex="-1"></a>r._reader.mark_entry_as_unread(test[<span class="dv">0</span>])</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+</section>
+<section id="automatically-mark-entries-as-read" class="level2">
+<h2 class="anchored" data-anchor-id="automatically-mark-entries-as-read">Automatically mark entries as read</h2>
+<p>When updating feeds, entries with titles matching these strings will automatically be marked as read</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb22"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb22-1"><a href="#cb22-1" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> i <span class="kw">in</span> [<span class="st">"Musk"</span>, <span class="st">"Apple"</span>, <span class="st">"Bezos"</span>, <span class="st">"Google"</span>, <span class="st">"Samsung"</span>, <span class="st">"iPhone"</span>, <span class="st">"iPad"</span>, <span class="st">"guardian.com/sport/"</span>, <span class="st">"guardian.com/football/"</span>, <span class="st">"thestar.com/sports"</span>]:</span>
+<span id="cb22-2"><a href="#cb22-2" aria-hidden="true" tabindex="-1"></a>    r._add_to_blacklist(i)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb23"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb23-1"><a href="#cb23-1" aria-hidden="true" tabindex="-1"></a>r._title_blacklist</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display">
+<pre><code>['Musk',
+ 'Apple',
+ 'Bezos',
+ 'Google',
+ 'Samsung',
+ 'iPhone',
+ 'iPad',
+ 'Premier League',
+ 'NHL',
+ 'NFL',
+ 'NBA',
+ 'guardian.com/sport/',
+ 'guardian.com/football/',
+ 'thestar.com/sports']</code></pre>
+</div>
+</div>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb25"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb25-1"><a href="#cb25-1" aria-hidden="true" tabindex="-1"></a><span class="co">#r.update()</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+</section>
+<section id="automatically-mark-entries-as-important" class="level2">
+<h2 class="anchored" data-anchor-id="automatically-mark-entries-as-important">Automatically mark entries as important</h2>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb26"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb26-1"><a href="#cb26-1" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> i <span class="kw">in</span> [<span class="st">"interest rate"</span>, <span class="st">"Bank of Canada"</span>, <span class="st">"housing market"</span>]:</span>
+<span id="cb26-2"><a href="#cb26-2" aria-hidden="true" tabindex="-1"></a>    r._add_to_whitelist(i)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb27"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb27-1"><a href="#cb27-1" aria-hidden="true" tabindex="-1"></a><span class="co">#r.update()</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+</section>
+<section id="low-level-access-to-data" class="level2">
+<h2 class="anchored" data-anchor-id="low-level-access-to-data">Low level access to data</h2>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb28"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb28-1"><a href="#cb28-1" aria-hidden="true" tabindex="-1"></a>entries <span class="op">=</span> r._get_entries(limit<span class="op">=</span><span class="dv">1</span>)</span>
+<span id="cb28-2"><a href="#cb28-2" aria-hidden="true" tabindex="-1"></a>[i <span class="cf">for</span> i <span class="kw">in</span> entries][<span class="dv">0</span>]</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display">
+<pre><code>Entry(id='https://thetyee.ca/News/2023/01/06/Glen-Clark-Open-BC-Housing-David-Eby-Government/', updated=None, title='Glen Clark Is Open to Running BC Housing (in News)', link='https://thetyee.ca/News/2023/01/06/Glen-Clark-Open-BC-Housing-David-Eby-Government/', author='Andrew MacLeod', published=None, summary='The former premier left the private sector this week and says he’s offered to help David Eby’s government.', content=(), enclosures=(Enclosure(href='https://thetyee.ca/News/2023/01/06/GlenClarkNDPConvention.jpg', type='image/jpeg', length=None),), read=False, read_modified=datetime.datetime(2023, 1, 7, 15, 5, 8, 100984, tzinfo=datetime.timezone.utc), important=False, important_modified=datetime.datetime(2023, 1, 7, 15, 5, 6, 970716, tzinfo=datetime.timezone.utc), added=datetime.datetime(2023, 1, 7, 15, 2, 53, 727599, tzinfo=datetime.timezone.utc), added_by='feed', last_updated=datetime.datetime(2023, 1, 7, 15, 2, 53, 727599, tzinfo=datetime.timezone.utc), original_feed_url='https://thetyee.ca/rss2.xml', feed=Feed(url='https://thetyee.ca/rss2.xml', updated=datetime.datetime(2023, 1, 7, 0, 15, 45, tzinfo=datetime.timezone.utc), title="The Tyee | BC's home for today's news, analysis and updates", link='https://thetyee.ca/', author='editor@thetyee.ca (Editor)', subtitle=None, version='rss20', user_title=None, added=datetime.datetime(2022, 12, 28, 19, 33, 57, 223793, tzinfo=datetime.timezone.utc), last_updated=datetime.datetime(2023, 1, 7, 15, 2, 53, 727599, tzinfo=datetime.timezone.utc), last_exception=None, updates_enabled=True))</code></pre>
+</div>
+</div>
+</section>
+<section id="cli" class="level2">
+<h2 class="anchored" data-anchor-id="cli">CLI</h2>
+<hr>
+<p><a href="https://github.com/radinplaid/pynewsreader/blob/master/pynewsreader/core.py#L306" target="_blank" style="float:right; font-size:smaller">source</a></p>
+<section id="main" class="level3">
+<h3 class="anchored" data-anchor-id="main">main</h3>
+<blockquote class="blockquote">
+<pre><code> main ()</code></pre>
+</blockquote>
+
+
+</section>
+</section>
+
+</main> <!-- /main -->
+<script id="quarto-html-after-body" type="application/javascript">
+window.document.addEventListener("DOMContentLoaded", function (event) {
+  const toggleBodyColorMode = (bsSheetEl) => {
+    const mode = bsSheetEl.getAttribute("data-mode");
+    const bodyEl = window.document.querySelector("body");
+    if (mode === "dark") {
+      bodyEl.classList.add("quarto-dark");
+      bodyEl.classList.remove("quarto-light");
+    } else {
+      bodyEl.classList.add("quarto-light");
+      bodyEl.classList.remove("quarto-dark");
+    }
+  }
+  const toggleBodyColorPrimary = () => {
+    const bsSheetEl = window.document.querySelector("link#quarto-bootstrap");
+    if (bsSheetEl) {
+      toggleBodyColorMode(bsSheetEl);
+    }
+  }
+  toggleBodyColorPrimary();  
+  const icon = "";
+  const anchorJS = new window.AnchorJS();
+  anchorJS.options = {
+    placement: 'right',
+    icon: icon
+  };
+  anchorJS.add('.anchored');
+  const clipboard = new window.ClipboardJS('.code-copy-button', {
+    target: function(trigger) {
+      return trigger.previousElementSibling;
+    }
+  });
+  clipboard.on('success', function(e) {
+    // button target
+    const button = e.trigger;
+    // don't keep focus
+    button.blur();
+    // flash "checked"
+    button.classList.add('code-copy-button-checked');
+    var currentTitle = button.getAttribute("title");
+    button.setAttribute("title", "Copied!");
+    let tooltip;
+    if (window.bootstrap) {
+      button.setAttribute("data-bs-toggle", "tooltip");
+      button.setAttribute("data-bs-placement", "left");
+      button.setAttribute("data-bs-title", "Copied!");
+      tooltip = new bootstrap.Tooltip(button, 
+        { trigger: "manual", 
+          customClass: "code-copy-button-tooltip",
+          offset: [0, -8]});
+      tooltip.show();    
+    }
+    setTimeout(function() {
+      if (tooltip) {
+        tooltip.hide();
+        button.removeAttribute("data-bs-title");
+        button.removeAttribute("data-bs-toggle");
+        button.removeAttribute("data-bs-placement");
+      }
+      button.setAttribute("title", currentTitle);
+      button.classList.remove('code-copy-button-checked');
+    }, 1000);
+    // clear code selection
+    e.clearSelection();
+  });
+  function tippyHover(el, contentFn) {
+    const config = {
+      allowHTML: true,
+      content: contentFn,
+      maxWidth: 500,
+      delay: 100,
+      arrow: false,
+      appendTo: function(el) {
+          return el.parentElement;
+      },
+      interactive: true,
+      interactiveBorder: 10,
+      theme: 'quarto',
+      placement: 'bottom-start'
+    };
+    window.tippy(el, config); 
+  }
+  const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+  for (var i=0; i<noterefs.length; i++) {
+    const ref = noterefs[i];
+    tippyHover(ref, function() {
+      // use id or data attribute instead here
+      let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+      try { href = new URL(href).hash; } catch {}
+      const id = href.replace(/^#\/?/, "");
+      const note = window.document.getElementById(id);
+      return note.innerHTML;
+    });
+  }
+  const findCites = (el) => {
+    const parentEl = el.parentElement;
+    if (parentEl) {
+      const cites = parentEl.dataset.cites;
+      if (cites) {
+        return {
+          el,
+          cites: cites.split(' ')
+        };
+      } else {
+        return findCites(el.parentElement)
+      }
+    } else {
+      return undefined;
+    }
+  };
+  var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+  for (var i=0; i<bibliorefs.length; i++) {
+    const ref = bibliorefs[i];
+    const citeInfo = findCites(ref);
+    if (citeInfo) {
+      tippyHover(citeInfo.el, function() {
+        var popup = window.document.createElement('div');
+        citeInfo.cites.forEach(function(cite) {
+          var citeDiv = window.document.createElement('div');
+          citeDiv.classList.add('hanging-indent');
+          citeDiv.classList.add('csl-entry');
+          var biblioDiv = window.document.getElementById('ref-' + cite);
+          if (biblioDiv) {
+            citeDiv.innerHTML = biblioDiv.innerHTML;
+          }
+          popup.appendChild(citeDiv);
+        });
+        return popup.innerHTML;
+      });
+    }
+  }
+});
+</script>
+</div> <!-- /content -->
+
+
+
+</body></html>

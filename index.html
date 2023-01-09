@@ -1,0 +1,794 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.2.313">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+<meta name="description" content="An easy to use news aggregator and viewer written in python">
+
+<title>pynewsreader</title>
+<style>
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: min(4vw, 1.5em);}
+div.column{flex: auto; overflow-x: auto;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1.6em;
+  vertical-align: middle;
+}
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+    color: #aaaaaa;
+  }
+pre.numberSource { margin-left: 3em; border-left: 1px solid #aaaaaa;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+code span.al { color: #ff0000; font-weight: bold; } /* Alert */
+code span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
+code span.at { color: #7d9029; } /* Attribute */
+code span.bn { color: #40a070; } /* BaseN */
+code span.bu { color: #008000; } /* BuiltIn */
+code span.cf { color: #007020; font-weight: bold; } /* ControlFlow */
+code span.ch { color: #4070a0; } /* Char */
+code span.cn { color: #880000; } /* Constant */
+code span.co { color: #60a0b0; font-style: italic; } /* Comment */
+code span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } /* CommentVar */
+code span.do { color: #ba2121; font-style: italic; } /* Documentation */
+code span.dt { color: #902000; } /* DataType */
+code span.dv { color: #40a070; } /* DecVal */
+code span.er { color: #ff0000; font-weight: bold; } /* Error */
+code span.ex { } /* Extension */
+code span.fl { color: #40a070; } /* Float */
+code span.fu { color: #06287e; } /* Function */
+code span.im { color: #008000; font-weight: bold; } /* Import */
+code span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Information */
+code span.kw { color: #007020; font-weight: bold; } /* Keyword */
+code span.op { color: #666666; } /* Operator */
+code span.ot { color: #007020; } /* Other */
+code span.pp { color: #bc7a00; } /* Preprocessor */
+code span.sc { color: #4070a0; } /* SpecialChar */
+code span.ss { color: #bb6688; } /* SpecialString */
+code span.st { color: #4070a0; } /* String */
+code span.va { color: #19177c; } /* Variable */
+code span.vs { color: #4070a0; } /* VerbatimString */
+code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warning */
+</style>
+
+
+<script src="site_libs/quarto-nav/quarto-nav.js"></script>
+<script src="site_libs/quarto-nav/headroom.min.js"></script>
+<script src="site_libs/clipboard/clipboard.min.js"></script>
+<script src="site_libs/quarto-search/autocomplete.umd.js"></script>
+<script src="site_libs/quarto-search/fuse.min.js"></script>
+<script src="site_libs/quarto-search/quarto-search.js"></script>
+<meta name="quarto:offset" content="./">
+<script src="site_libs/quarto-html/quarto.js"></script>
+<script src="site_libs/quarto-html/popper.min.js"></script>
+<script src="site_libs/quarto-html/tippy.umd.min.js"></script>
+<script src="site_libs/quarto-html/anchor.min.js"></script>
+<link href="site_libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="site_libs/quarto-html/quarto-syntax-highlighting.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="site_libs/bootstrap/bootstrap.min.js"></script>
+<link href="site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="site_libs/bootstrap/bootstrap.min.css" rel="stylesheet" id="quarto-bootstrap" data-mode="light">
+<script id="quarto-search-options" type="application/json">{
+  "location": "navbar",
+  "copy-button": false,
+  "collapse-after": 3,
+  "panel-placement": "end",
+  "type": "overlay",
+  "limit": 20,
+  "language": {
+    "search-no-results-text": "No results",
+    "search-matching-documents-text": "matching documents",
+    "search-copy-link-title": "Copy link to search",
+    "search-hide-matches-text": "Hide additional matches",
+    "search-more-match-text": "more match in this document",
+    "search-more-matches-text": "more matches in this document",
+    "search-clear-button-title": "Clear",
+    "search-detached-cancel-button-title": "Cancel",
+    "search-submit-button-title": "Submit"
+  }
+}</script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.6/require.min.js" integrity="sha512-c3Nl8+7g4LMSTdrm621y7kf9v3SDPnhxLNhcjFJbKECVnmZHTdo+IRO05sNLTH/D3vA6u1X32ehoLC7WFVdheg==" crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.5.1/jquery.min.js" integrity="sha512-bLT0Qm9VnAYZDflyKcBaQ2gg0hSYNQrJ8RilYldYQ1FxQYoCLtUjuuRuZo+fjqhx/qtq/1itJ0C2ejDxltZVFg==" crossorigin="anonymous"></script>
+<script type="application/javascript">define('jquery', [],function() {return window.jQuery;})</script>
+
+
+<link rel="stylesheet" href="styles.css">
+<meta property="og:title" content="pynewsreader">
+<meta property="og:description" content="An easy to use news aggregator and viewer written in python">
+<meta property="og:site-name" content="pynewsreader">
+<meta name="twitter:title" content="pynewsreader">
+<meta name="twitter:description" content="An easy to use news aggregator and viewer written in python">
+<meta name="twitter:card" content="summary">
+</head>
+
+<body class="nav-sidebar floating nav-fixed">
+
+<div id="quarto-search-results"></div>
+  <header id="quarto-header" class="headroom fixed-top">
+    <nav class="navbar navbar-expand-lg navbar-dark ">
+      <div class="navbar-container container-fluid">
+      <div class="navbar-brand-container">
+    <a class="navbar-brand" href="./index.html">
+    <span class="navbar-title">pynewsreader</span>
+    </a>
+  </div>
+          <div id="quarto-search" class="" title="Search"></div>
+      </div> <!-- /container-fluid -->
+    </nav>
+  <nav class="quarto-secondary-nav" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+    <div class="container-fluid d-flex justify-content-between">
+      <h1 class="quarto-secondary-nav-title">pynewsreader</h1>
+      <button type="button" class="quarto-btn-toggle btn" aria-label="Show secondary navigation">
+        <i class="bi bi-chevron-right"></i>
+      </button>
+    </div>
+  </nav>
+</header>
+<!-- content -->
+<div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article page-navbar">
+<!-- sidebar -->
+  <nav id="quarto-sidebar" class="sidebar collapse sidebar-navigation floating overflow-auto">
+    <div class="sidebar-menu-container"> 
+    <ul class="list-unstyled mt-1">
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./index.html" class="sidebar-item-text sidebar-link active">pynewsreader</a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./core.html" class="sidebar-item-text sidebar-link">core</a>
+  </div>
+</li>
+    </ul>
+    </div>
+</nav>
+<!-- margin-sidebar -->
+    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
+        <nav id="TOC" role="doc-toc" class="toc-active">
+    <h2 id="toc-title">On this page</h2>
+   
+  <ul>
+  <li><a href="#install" id="toc-install" class="nav-link active" data-scroll-target="#install">Install</a></li>
+  <li><a href="#command-line-usage" id="toc-command-line-usage" class="nav-link" data-scroll-target="#command-line-usage">Command Line Usage</a></li>
+  <li><a href="#python-usage" id="toc-python-usage" class="nav-link" data-scroll-target="#python-usage">Python Usage</a></li>
+  </ul>
+<div class="toc-actions"><div><i class="bi bi-github"></i></div><div class="action-links"><p><a href="https://github.com/radinplaid/pynewsreader/issues/new" class="toc-action">Report an issue</a></p></div></div></nav>
+    </div>
+<!-- main -->
+<main class="content" id="quarto-document-content">
+
+<header id="title-block-header" class="quarto-title-block default">
+<div class="quarto-title">
+<h1 class="title d-none d-lg-block">pynewsreader</h1>
+</div>
+
+<div>
+  <div class="description">
+    An easy to use news aggregator and viewer written in python
+  </div>
+</div>
+
+
+<div class="quarto-title-meta">
+
+    
+  
+    
+  </div>
+  
+
+</header>
+
+<!-- WARNING: THIS FILE WAS AUTOGENERATED! DO NOT EDIT! -->
+<section id="install" class="level2">
+<h2 class="anchored" data-anchor-id="install">Install</h2>
+<div class="sourceCode" id="cb1"><pre class="sourceCode sh code-with-copy"><code class="sourceCode bash"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="ex">pip</span> install git+https://github.com/radinplaid/pynewsreader.git</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</section>
+<section id="command-line-usage" class="level2">
+<h2 class="anchored" data-anchor-id="command-line-usage">Command Line Usage</h2>
+<div class="sourceCode" id="cb2"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Show help</span></span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="ex">pnr</span> <span class="at">--help</span></span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a><span class="co"># Add a feed</span></span>
+<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a><span class="ex">pnr</span> add_feed https://rss.cbc.ca/lineup/world.xml</span>
+<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a><span class="co"># Update feed(s)</span></span>
+<span id="cb2-8"><a href="#cb2-8" aria-hidden="true" tabindex="-1"></a><span class="ex">pnr</span> update</span>
+<span id="cb2-9"><a href="#cb2-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-10"><a href="#cb2-10" aria-hidden="true" tabindex="-1"></a><span class="co"># Show entries</span></span>
+<span id="cb2-11"><a href="#cb2-11" aria-hidden="true" tabindex="-1"></a><span class="ex">pnr</span> show <span class="at">--limit</span> 10</span>
+<span id="cb2-12"><a href="#cb2-12" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-13"><a href="#cb2-13" aria-hidden="true" tabindex="-1"></a><span class="co"># Search entries</span></span>
+<span id="cb2-14"><a href="#cb2-14" aria-hidden="true" tabindex="-1"></a><span class="ex">pnr</span> search canada</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</section>
+<section id="python-usage" class="level2">
+<h2 class="anchored" data-anchor-id="python-usage">Python Usage</h2>
+<p>Import and initialize pnr object</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb3"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> pynewsreader.core <span class="im">import</span> Feed, PyNewsReader</span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a>pnr <span class="op">=</span> PyNewsReader()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>Add a feed, and use a custom name for it</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb4"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>myfeed <span class="op">=</span> Feed(</span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>    url<span class="op">=</span><span class="st">"https://www.thestar.com/content/thestar/feed.RSSManagerServlet.articles.topstories.rss"</span>,</span>
+<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a>    name<span class="op">=</span><span class="st">"Toronto Star | Top Stories"</span>,</span>
+<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb4-5"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-6"><a href="#cb4-6" aria-hidden="true" tabindex="-1"></a>pnr.add_feed(myfeed)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>Update feeds</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb5"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a>pnr.update()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>List entries</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb6"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a>pnr.show()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display">
+<pre style="white-space:pre;overflow-x:auto;line-height:normal;font-family:Menlo,'DejaVu Sans Mono',consolas,'Courier New',monospace">╭──────────────────────────────────────────── <span style="font-weight: bold">CBC | Top Stories News</span> ─────────────────────────────────────────────╮
+│ Title: <span style="font-weight: bold">The Garage Gang: Four decades of square dancing, mischief and friendship on P.E.I.</span>                       │
+│ Date: 2023-01-08                                                                                                │
+│                                                                                                                 │
+│ A group of Islanders have been meeting up regularly for 40 years, their bond withstanding the test of time and  │
+│ life’s hardships.                                                                                               │
+│                                                                                                                 │
+╰── <a href="https://www.cbc.ca/news/canada/prince-edward-island/garage-gang-square-dancing-friendship-1.6699472?cmp=rss" target="_blank">https://www.cbc.ca/news/canada/prince-edward-island/garage-gang-square-dancing-friendship-1.6699472?cmp=rss</a> ──╯
+</pre>
+</div>
+<div class="cell-output cell-output-display">
+<pre style="white-space:pre;overflow-x:auto;line-height:normal;font-family:Menlo,'DejaVu Sans Mono',consolas,'Courier New',monospace"></pre>
+</div>
+<div class="cell-output cell-output-display">
+<pre style="white-space:pre;overflow-x:auto;line-height:normal;font-family:Menlo,'DejaVu Sans Mono',consolas,'Courier New',monospace">╭──────────────────────────────────────────── <span style="font-weight: bold">CBC | Top Stories News</span> ─────────────────────────────────────────────╮
+│ Title: <span style="font-weight: bold">Book recovered from Franklin ship could show whether other written items are salvageable, historian says</span> │
+│ Date: 2023-01-08                                                                                                │
+│                                                                                                                 │
+│ A leather-bound folio&nbsp;found one of Capt. John Franklin's doomed Arctic ships might show how recoverable other   │
+│ documents might be in future searches,&nbsp;according to historian Ken McGoogan.                                     │
+│                                                                                                                 │
+╰──── <a href="https://www.cbc.ca/news/canada/north/2022-excavation-franklin-ship-northwest-passage-1.6703841?cmp=rss" target="_blank">https://www.cbc.ca/news/canada/north/2022-excavation-franklin-ship-northwest-passage-1.6703841?cmp=rss</a> ─────╯
+</pre>
+</div>
+<div class="cell-output cell-output-display">
+<pre style="white-space:pre;overflow-x:auto;line-height:normal;font-family:Menlo,'DejaVu Sans Mono',consolas,'Courier New',monospace"></pre>
+</div>
+<div class="cell-output cell-output-display">
+<pre style="white-space:pre;overflow-x:auto;line-height:normal;font-family:Menlo,'DejaVu Sans Mono',consolas,'Courier New',monospace">╭───────────────────────────────────────────────── <span style="font-weight: bold">The Guardian</span> ──────────────────────────────────────────────────╮
+│ Title: <span style="font-weight: bold">Tory right warns Sunak: this is calm before storm over small boats and Brexit</span>                            │
+│ Date: 2023-01-08                                                                                                │
+│                                                                                                                 │
+│ As the PM tries to move on from ‘perma-crisis’, agitated former ministers promise big trouble aheadSenior       │
+│ Tories are warning Rishi Sunak that he is enjoying the “calm before the storm”, with his own MPs already        │
+│ plotting to tackle him over immigration and a beleaguered plan to secure “Brexit freedoms”.The prime minister   │
+│ spent Saturday attempting to show his commitment to easing the crisis in the NHS – one of the five pledges he   │
+│ made in his new year’s speech – by holding a summit with health services figures. Delays to discharging people  │
+│ from hospital, social care shortages, an A&amp;E crisis and waiting lists were all discussed at the “NHS recovery   │
+│ forum”. Sunak told those attending that “boldness and radicalism” would be needed to solve the pressures.       │
+│ Continue reading...                                                                                             │
+│                                                                                                                 │
+╰─ <a href="https://www.theguardian.com/politics/2023/jan/08/tory-right-warns-sunak-calm-before-storm-small-boats-brexit" target="_blank">https://www.theguardian.com/politics/2023/jan/08/tory-right-warns-sunak-calm-before-storm-small-boats-brexit</a> ──╯
+</pre>
+</div>
+<div class="cell-output cell-output-display">
+<pre style="white-space:pre;overflow-x:auto;line-height:normal;font-family:Menlo,'DejaVu Sans Mono',consolas,'Courier New',monospace"></pre>
+</div>
+<div class="cell-output cell-output-display">
+<pre style="white-space:pre;overflow-x:auto;line-height:normal;font-family:Menlo,'DejaVu Sans Mono',consolas,'Courier New',monospace">╭───────────────────────────────────────────────── <span style="font-weight: bold">The Guardian</span> ──────────────────────────────────────────────────╮
+│ Title: <span style="font-weight: bold">Russia and Belarus extend military drills amid fears of new push into Ukraine</span>                            │
+│ Date: 2023-01-08                                                                                                │
+│                                                                                                                 │
+│ Weapons, soldiers and equipment added to exercises, as concern grows Minsk is being pressured to join           │
+│ warRussia-Ukraine war – latest news updatesRussia and Belarus have expanded their joint military training       │
+│ exercises in Belarus, the country’s defence TV channel said on Sunday, as concern grows that Moscow is          │
+│ pressuring its closest ally to join the war in Ukraine.The two countries added weapons, soldiers and            │
+│ specialised equipment to the exercises and were doing drills drawing on Russian experience in Ukraine, Reuters  │
+│ reported. Continue reading...                                                                                   │
+│                                                                                                                 │
+╰── <a href="https://www.theguardian.com/world/2023/jan/08/russia-belarus-extend-military-drills-fears-new-push-ukraine" target="_blank">https://www.theguardian.com/world/2023/jan/08/russia-belarus-extend-military-drills-fears-new-push-ukraine</a> ───╯
+</pre>
+</div>
+<div class="cell-output cell-output-display">
+<pre style="white-space:pre;overflow-x:auto;line-height:normal;font-family:Menlo,'DejaVu Sans Mono',consolas,'Courier New',monospace"></pre>
+</div>
+<div class="cell-output cell-output-display">
+<pre style="white-space:pre;overflow-x:auto;line-height:normal;font-family:Menlo,'DejaVu Sans Mono',consolas,'Courier New',monospace">╭───────────────────────────────────────────────── <span style="font-weight: bold">The Guardian</span> ──────────────────────────────────────────────────╮
+│ Title: <span style="font-weight: bold">Russia-Ukraine war: Moscow’s ceasefire ends with no let up in fighting; Ukraine strikes power plants in </span> │
+│ <span style="font-weight: bold">Donetsk, officials say – live</span>                                                                                   │
+│ Date: 2023-01-08                                                                                                │
+│                                                                                                                 │
+│ Russian attacks reported in at least seven Ukraine regions despite Putin’s ceasefire pledge; shelling           │
+│ reportedly damages power plants in Moscow-controlled regionWhat we know on day 319 of the invasionOne person    │
+│ was killed as a result of the attack on the Starobesheve power plant in Novyi Svit, Russia’s state Tass news    │
+│ agency said on Sunday.The thermal power plant was one of two in part of Ukraine’s Donetsk region that is        │
+│ controlled by Russian forces that were damaged in a rocket attack by the Ukrainian army, Moscow-installed       │
+│ officials said.The body of one dead woman was extracted from under the rubble at the plant.The tasks set by the │
+│ president (Putin) for the special military operation will still be fulfilled.And there definitely will be a     │
+│ victory. Continue reading...                                                                                    │
+│                                                                                                                 │
+╰─ <a href="https://www.theguardian.com/world/live/2023/jan/08/russia-ukraine-war-moscows-ceasefire-ends-with-no-let-up-in-fighting-ukraine-strikes-power-plants-in-donetsk-officials-say-live" target="_blank">https://www.theguardian.com/world/live/2023/jan/08/russia-ukraine-war-moscows-ceasefire-ends-with-no-let-up-in</a>─╯
+</pre>
+</div>
+<div class="cell-output cell-output-display">
+<pre style="white-space:pre;overflow-x:auto;line-height:normal;font-family:Menlo,'DejaVu Sans Mono',consolas,'Courier New',monospace"></pre>
+</div>
+<div class="cell-output cell-output-display">
+<pre style="white-space:pre;overflow-x:auto;line-height:normal;font-family:Menlo,'DejaVu Sans Mono',consolas,'Courier New',monospace">╭───────────────────────────────────────────────── <span style="font-weight: bold">The Guardian</span> ──────────────────────────────────────────────────╮
+│ Title: <span style="font-weight: bold">Officer arrested after car crash kills two innocent teenagers during police chase</span>                        │
+│ Date: 2023-01-08                                                                                                │
+│                                                                                                                 │
+│ Maggie Dunn, 17, and Caroline Gill, 16, died in collision as chased suspected car thief in Louisiana townIt was │
+│ a tragically high price to pay for catching a suspected car thief: two innocent teenagers dead and a police     │
+│ officer jailed, facing serious charges for a car crash that resulted from the pursuit.Maggie Dunn, 17, and      │
+│ Caroline Gill, 16, who were cheerleaders for their high school in the southern Louisiana town of Brusly, died   │
+│ in the collision on 31 December. They’re the latest fatalities among hundreds every year attributed to          │
+│ accidents involving police pursuits in the US. Continue reading...                                              │
+│                                                                                                                 │
+╰──── <a href="https://www.theguardian.com/us-news/2023/jan/08/officer-arrested-police-chase-car-crash-kills-two-teens" target="_blank">https://www.theguardian.com/us-news/2023/jan/08/officer-arrested-police-chase-car-crash-kills-two-teens</a> ────╯
+</pre>
+</div>
+<div class="cell-output cell-output-display">
+<pre style="white-space:pre;overflow-x:auto;line-height:normal;font-family:Menlo,'DejaVu Sans Mono',consolas,'Courier New',monospace"></pre>
+</div>
+</div>
+<p>Search entries</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb7"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> datetime</span>
+<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> dateutil</span>
+<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pytz</span>
+<span id="cb7-4"><a href="#cb7-4" aria-hidden="true" tabindex="-1"></a>test <span class="op">=</span> [i <span class="cf">for</span> i <span class="kw">in</span> pnr._reader.get_entries(limit<span class="op">=</span><span class="dv">10</span>)][<span class="dv">0</span>]</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb8"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a>dateutil.parser.parse(<span class="st">"2023-01-06"</span>).replace(tzinfo<span class="op">=</span>pytz.UTC)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display">
+<pre><code>datetime.datetime(2023, 1, 6, 0, 0, tzinfo=&lt;UTC&gt;)</code></pre>
+</div>
+</div>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb10"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a>dateutil.parser.parse(<span class="st">"2023-02-02"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display">
+<pre><code>datetime.datetime(2023, 2, 2, 0, 0)</code></pre>
+</div>
+</div>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb12"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a>test.feed.url</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display">
+<pre><code>'https://www.theguardian.com/commentisfree/all/rss'</code></pre>
+</div>
+</div>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb14"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a>test.feed.title</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display">
+<pre><code>'The Guardian'</code></pre>
+</div>
+</div>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb16"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display">
+<pre><code>PosixPath('.')</code></pre>
+</div>
+</div>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb18"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb18-1"><a href="#cb18-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> pathlib <span class="im">import</span> Path</span>
+<span id="cb18-2"><a href="#cb18-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> json</span>
+<span id="cb18-3"><a href="#cb18-3" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> shutil</span>
+<span id="cb18-4"><a href="#cb18-4" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> os</span>
+<span id="cb18-5"><a href="#cb18-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb18-6"><a href="#cb18-6" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> jsonfile <span class="kw">in</span> Path.home().glob(<span class="st">"*chapters.json"</span>):</span>
+<span id="cb18-7"><a href="#cb18-7" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(jsonfile)</span>
+<span id="cb18-8"><a href="#cb18-8" aria-hidden="true" tabindex="-1"></a>    <span class="cf">with</span> jsonfile.<span class="bu">open</span>() <span class="im">as</span> myfile:</span>
+<span id="cb18-9"><a href="#cb18-9" aria-hidden="true" tabindex="-1"></a>        x <span class="op">=</span> json.load(myfile)</span>
+<span id="cb18-10"><a href="#cb18-10" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb18-11"><a href="#cb18-11" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Better to use recursion</span></span>
+<span id="cb18-12"><a href="#cb18-12" aria-hidden="true" tabindex="-1"></a>    newchapters <span class="op">=</span> []</span>
+<span id="cb18-13"><a href="#cb18-13" aria-hidden="true" tabindex="-1"></a>    <span class="cf">for</span> i <span class="kw">in</span> x[<span class="st">'content_metadata'</span>][<span class="st">'chapter_info'</span>][<span class="st">'chapters'</span>]:</span>
+<span id="cb18-14"><a href="#cb18-14" aria-hidden="true" tabindex="-1"></a>        <span class="cf">if</span> <span class="st">'chapters'</span> <span class="kw">in</span> i:</span>
+<span id="cb18-15"><a href="#cb18-15" aria-hidden="true" tabindex="-1"></a>            <span class="cf">for</span> j <span class="kw">in</span> i[<span class="st">'chapters'</span>]:</span>
+<span id="cb18-16"><a href="#cb18-16" aria-hidden="true" tabindex="-1"></a>                <span class="cf">if</span> <span class="st">'chapters'</span> <span class="kw">in</span> j:</span>
+<span id="cb18-17"><a href="#cb18-17" aria-hidden="true" tabindex="-1"></a>                    <span class="cf">for</span> k <span class="kw">in</span> j[<span class="st">'chapters'</span>]:</span>
+<span id="cb18-18"><a href="#cb18-18" aria-hidden="true" tabindex="-1"></a>                        <span class="cf">if</span> <span class="st">'chapters'</span> <span class="kw">in</span> k:</span>
+<span id="cb18-19"><a href="#cb18-19" aria-hidden="true" tabindex="-1"></a>                            newchapters.append(k) </span>
+<span id="cb18-20"><a href="#cb18-20" aria-hidden="true" tabindex="-1"></a>                        <span class="cf">else</span>:</span>
+<span id="cb18-21"><a href="#cb18-21" aria-hidden="true" tabindex="-1"></a>                            <span class="bu">print</span>(i,j)</span>
+<span id="cb18-22"><a href="#cb18-22" aria-hidden="true" tabindex="-1"></a>                            <span class="cf">raise</span> <span class="pp">Exception</span>()</span>
+<span id="cb18-23"><a href="#cb18-23" aria-hidden="true" tabindex="-1"></a>                <span class="cf">else</span>:</span>
+<span id="cb18-24"><a href="#cb18-24" aria-hidden="true" tabindex="-1"></a>                    newchapters.append(j) </span>
+<span id="cb18-25"><a href="#cb18-25" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb18-26"><a href="#cb18-26" aria-hidden="true" tabindex="-1"></a>        <span class="cf">else</span>:</span>
+<span id="cb18-27"><a href="#cb18-27" aria-hidden="true" tabindex="-1"></a>            newchapters.append(i)</span>
+<span id="cb18-28"><a href="#cb18-28" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb18-29"><a href="#cb18-29" aria-hidden="true" tabindex="-1"></a>    x[<span class="st">'content_metadata'</span>][<span class="st">'chapter_info'</span>][<span class="st">'chapters'</span>] <span class="op">=</span> newchapters</span>
+<span id="cb18-30"><a href="#cb18-30" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb18-31"><a href="#cb18-31" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> <span class="kw">not</span> Path(<span class="bu">str</span>(jsonfile)<span class="op">+</span><span class="st">".backup"</span>).exists():</span>
+<span id="cb18-32"><a href="#cb18-32" aria-hidden="true" tabindex="-1"></a>        shutil.copy(jsonfile, <span class="bu">str</span>(jsonfile)<span class="op">+</span><span class="st">".backup"</span>)</span>
+<span id="cb18-33"><a href="#cb18-33" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb18-34"><a href="#cb18-34" aria-hidden="true" tabindex="-1"></a>    <span class="cf">with</span> <span class="bu">open</span>(<span class="bu">str</span>(jsonfile), <span class="st">"wt"</span>) <span class="im">as</span> myfile:</span>
+<span id="cb18-35"><a href="#cb18-35" aria-hidden="true" tabindex="-1"></a>        json.dump(x, myfile)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>/home/mark/Somebody_Saved_Me_Words__Music__Vol._27-chapters.json
+/home/mark/Troy_The_Greek_Myths_Reimagined-chapters.json
+/home/mark/The_Secret_History_of_Soldiers_How_Canadians_Survived_the_Great_War-chapters.json</code></pre>
+</div>
+</div>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb20"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display">
+<pre><code>'/home/mark/Culloden_The_History_and_Archaeology_of_the_Last_Clan_Battle-chapters.json.backup'</code></pre>
+</div>
+</div>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb22"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb22-1"><a href="#cb22-1" aria-hidden="true" tabindex="-1"></a>newchapters</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display">
+<pre><code>[{'length_ms': 18942,
+  'start_offset_ms': 0,
+  'start_offset_sec': 0,
+  'title': 'Opening Credits'},
+ {'length_ms': 10444,
+  'start_offset_ms': 18942,
+  'start_offset_sec': 19,
+  'title': "Publisher's Note"},
+ {'length_ms': 2534352,
+  'start_offset_ms': 29386,
+  'start_offset_sec': 29,
+  'title': 'Introduction: The Battle of Culloden - More Than a Difference of Opinion'},
+ {'length_ms': 3121273,
+  'start_offset_ms': 2563738,
+  'start_offset_sec': 2564,
+  'title': 'Chapter 1: The ’45 Campaign'},
+ {'length_ms': 757310,
+  'start_offset_ms': 5790371,
+  'start_offset_sec': 5790,
+  'title': 'The Regiments at Culloden'},
+ {'length_ms': 325200,
+  'start_offset_ms': 6547681,
+  'start_offset_sec': 6548,
+  'title': 'Organization'},
+ {'length_ms': 1113436,
+  'start_offset_ms': 6872881,
+  'start_offset_sec': 6873,
+  'title': 'Recruitment'},
+ {'length_ms': 382370,
+  'start_offset_ms': 7986317,
+  'start_offset_sec': 7986,
+  'title': 'The French'},
+ {'length_ms': 1006809,
+  'start_offset_ms': 8368687,
+  'start_offset_sec': 8369,
+  'title': 'Fighting'},
+ {'length_ms': 348598,
+  'start_offset_ms': 9466192,
+  'start_offset_sec': 9466,
+  'title': 'The Regiments at Culloden'},
+ {'length_ms': 172700,
+  'start_offset_ms': 9814790,
+  'start_offset_sec': 9815,
+  'title': 'First Brigade'},
+ {'length_ms': 207100,
+  'start_offset_ms': 9987490,
+  'start_offset_sec': 9987,
+  'title': 'Third Brigade'},
+ {'length_ms': 148200,
+  'start_offset_ms': 10194590,
+  'start_offset_sec': 10195,
+  'title': 'Second Brigade'},
+ {'length_ms': 331010,
+  'start_offset_ms': 10342790,
+  'start_offset_sec': 10343,
+  'title': 'Fourth Brigade'},
+ {'length_ms': 162290,
+  'start_offset_ms': 10673800,
+  'start_offset_sec': 10674,
+  'title': 'Unbrigaded'},
+ {'length_ms': 223500,
+  'start_offset_ms': 10836090,
+  'start_offset_sec': 10836,
+  'title': 'Cavalry Regiments'},
+ {'length_ms': 142388,
+  'start_offset_ms': 11059590,
+  'start_offset_sec': 11060,
+  'title': 'The Royal Artillery'},
+ {'length_ms': 226893,
+  'start_offset_ms': 11201978,
+  'start_offset_sec': 11202,
+  'title': 'Organization'},
+ {'length_ms': 1658800,
+  'start_offset_ms': 11428871,
+  'start_offset_sec': 11429,
+  'title': 'Recruitment'},
+ {'length_ms': 104860,
+  'start_offset_ms': 13087671,
+  'start_offset_sec': 13088,
+  'title': 'The Regiments’ Successors'},
+ {'length_ms': 1447053,
+  'start_offset_ms': 13201891,
+  'start_offset_sec': 13202,
+  'title': 'Government Cavalry'},
+ {'length_ms': 566580,
+  'start_offset_ms': 14648944,
+  'start_offset_sec': 14649,
+  'title': 'Jacobite Cavalry'},
+ {'length_ms': 495024,
+  'start_offset_ms': 15215524,
+  'start_offset_sec': 15216,
+  'title': 'Cavalry Action at Culloden'},
+ {'length_ms': 3431073,
+  'start_offset_ms': 15710548,
+  'start_offset_sec': 15711,
+  'title': 'Chapter 5: The Battle of Culloden: A Narrative Account'},
+ {'length_ms': 145247,
+  'start_offset_ms': 19153545,
+  'start_offset_sec': 19154,
+  'title': 'Introduction'},
+ {'length_ms': 386201,
+  'start_offset_ms': 19298792,
+  'start_offset_sec': 19299,
+  'title': 'The Battlefield Then and Now'},
+ {'length_ms': 4274368,
+  'start_offset_ms': 19684993,
+  'start_offset_sec': 19685,
+  'title': 'Results'},
+ {'length_ms': 53388,
+  'start_offset_ms': 23959361,
+  'start_offset_sec': 23959,
+  'title': 'Summing Up'},
+ {'length_ms': 78043,
+  'start_offset_ms': 24012749,
+  'start_offset_sec': 24013,
+  'title': 'Acknowledgements'},
+ {'length_ms': 157489,
+  'start_offset_ms': 24504474,
+  'start_offset_sec': 24504,
+  'title': '1. Yorke’s Sketch Map, 1746'},
+ {'length_ms': 257799,
+  'start_offset_ms': 24661963,
+  'start_offset_sec': 24662,
+  'title': '2. Cathcart’s Sketch Map, 1746'},
+ {'length_ms': 767378,
+  'start_offset_ms': 24919762,
+  'start_offset_sec': 24920,
+  'title': '3. Sandby’s Map, 1746'},
+ {'length_ms': 475069,
+  'start_offset_ms': 25687140,
+  'start_offset_sec': 25687,
+  'title': '4. Leigh Jones’ Map, 1746'},
+ {'length_ms': 250602,
+  'start_offset_ms': 26162209,
+  'start_offset_sec': 26162,
+  'title': '5. Paterson’s Map, About 1746'},
+ {'length_ms': 587973,
+  'start_offset_ms': 26412811,
+  'start_offset_sec': 26413,
+  'title': '6. Finlayson’s Map, 1747-51'},
+ {'length_ms': 207126,
+  'start_offset_ms': 27000784,
+  'start_offset_sec': 27001,
+  'title': '7. Lord Elcho’s Sketch Map, Between 1747 and 1754'},
+ {'length_ms': 320799,
+  'start_offset_ms': 27207910,
+  'start_offset_sec': 27208,
+  'title': '8. French Officer’s Map, About 1748'},
+ {'length_ms': 204102,
+  'start_offset_ms': 27528709,
+  'start_offset_sec': 27529,
+  'title': 'Conclusion'},
+ {'length_ms': 47445,
+  'start_offset_ms': 27732811,
+  'start_offset_sec': 27733,
+  'title': 'Acknowledgements'},
+ {'length_ms': 2621462,
+  'start_offset_ms': 27780256,
+  'start_offset_sec': 27780,
+  'title': 'Chapter 8: Irish Intriguers and Scottish Councils: Post-Culloden Narratives and Their Recriminations'},
+ {'length_ms': 250086,
+  'start_offset_ms': 30453527,
+  'start_offset_sec': 30454,
+  'title': 'The Battlefield Landscape, 1746-1846'},
+ {'length_ms': 991500,
+  'start_offset_ms': 30703613,
+  'start_offset_sec': 30704,
+  'title': 'The Culloden Memorials'},
+ {'length_ms': 362199,
+  'start_offset_ms': 31695113,
+  'start_offset_sec': 31695,
+  'title': 'Developments on the Battlefield, 1897-1937'},
+ {'length_ms': 726588,
+  'start_offset_ms': 32057312,
+  'start_offset_sec': 32057,
+  'title': 'Restoration and Conservation of the Battlefield: The Work of the National Trust for Scotland'},
+ {'length_ms': 1321740,
+  'start_offset_ms': 32961356,
+  'start_offset_sec': 32961,
+  'title': 'The ’45 and the War of the Austrian Succession'},
+ {'length_ms': 1194570,
+  'start_offset_ms': 34283096,
+  'start_offset_sec': 34283,
+  'title': 'Culloden and British Politics'},
+ {'length_ms': 985867,
+  'start_offset_ms': 35477666,
+  'start_offset_sec': 35478,
+  'title': 'The ’45 and the Jacobite Cause'},
+ {'length_ms': 36834,
+  'start_offset_ms': 36463533,
+  'start_offset_sec': 36464,
+  'title': 'End Credits'}]</code></pre>
+</div>
+</div>
+
+
+</section>
+
+</main> <!-- /main -->
+<script id="quarto-html-after-body" type="application/javascript">
+window.document.addEventListener("DOMContentLoaded", function (event) {
+  const toggleBodyColorMode = (bsSheetEl) => {
+    const mode = bsSheetEl.getAttribute("data-mode");
+    const bodyEl = window.document.querySelector("body");
+    if (mode === "dark") {
+      bodyEl.classList.add("quarto-dark");
+      bodyEl.classList.remove("quarto-light");
+    } else {
+      bodyEl.classList.add("quarto-light");
+      bodyEl.classList.remove("quarto-dark");
+    }
+  }
+  const toggleBodyColorPrimary = () => {
+    const bsSheetEl = window.document.querySelector("link#quarto-bootstrap");
+    if (bsSheetEl) {
+      toggleBodyColorMode(bsSheetEl);
+    }
+  }
+  toggleBodyColorPrimary();  
+  const icon = "";
+  const anchorJS = new window.AnchorJS();
+  anchorJS.options = {
+    placement: 'right',
+    icon: icon
+  };
+  anchorJS.add('.anchored');
+  const clipboard = new window.ClipboardJS('.code-copy-button', {
+    target: function(trigger) {
+      return trigger.previousElementSibling;
+    }
+  });
+  clipboard.on('success', function(e) {
+    // button target
+    const button = e.trigger;
+    // don't keep focus
+    button.blur();
+    // flash "checked"
+    button.classList.add('code-copy-button-checked');
+    var currentTitle = button.getAttribute("title");
+    button.setAttribute("title", "Copied!");
+    let tooltip;
+    if (window.bootstrap) {
+      button.setAttribute("data-bs-toggle", "tooltip");
+      button.setAttribute("data-bs-placement", "left");
+      button.setAttribute("data-bs-title", "Copied!");
+      tooltip = new bootstrap.Tooltip(button, 
+        { trigger: "manual", 
+          customClass: "code-copy-button-tooltip",
+          offset: [0, -8]});
+      tooltip.show();    
+    }
+    setTimeout(function() {
+      if (tooltip) {
+        tooltip.hide();
+        button.removeAttribute("data-bs-title");
+        button.removeAttribute("data-bs-toggle");
+        button.removeAttribute("data-bs-placement");
+      }
+      button.setAttribute("title", currentTitle);
+      button.classList.remove('code-copy-button-checked');
+    }, 1000);
+    // clear code selection
+    e.clearSelection();
+  });
+  function tippyHover(el, contentFn) {
+    const config = {
+      allowHTML: true,
+      content: contentFn,
+      maxWidth: 500,
+      delay: 100,
+      arrow: false,
+      appendTo: function(el) {
+          return el.parentElement;
+      },
+      interactive: true,
+      interactiveBorder: 10,
+      theme: 'quarto',
+      placement: 'bottom-start'
+    };
+    window.tippy(el, config); 
+  }
+  const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+  for (var i=0; i<noterefs.length; i++) {
+    const ref = noterefs[i];
+    tippyHover(ref, function() {
+      // use id or data attribute instead here
+      let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+      try { href = new URL(href).hash; } catch {}
+      const id = href.replace(/^#\/?/, "");
+      const note = window.document.getElementById(id);
+      return note.innerHTML;
+    });
+  }
+  const findCites = (el) => {
+    const parentEl = el.parentElement;
+    if (parentEl) {
+      const cites = parentEl.dataset.cites;
+      if (cites) {
+        return {
+          el,
+          cites: cites.split(' ')
+        };
+      } else {
+        return findCites(el.parentElement)
+      }
+    } else {
+      return undefined;
+    }
+  };
+  var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+  for (var i=0; i<bibliorefs.length; i++) {
+    const ref = bibliorefs[i];
+    const citeInfo = findCites(ref);
+    if (citeInfo) {
+      tippyHover(citeInfo.el, function() {
+        var popup = window.document.createElement('div');
+        citeInfo.cites.forEach(function(cite) {
+          var citeDiv = window.document.createElement('div');
+          citeDiv.classList.add('hanging-indent');
+          citeDiv.classList.add('csl-entry');
+          var biblioDiv = window.document.getElementById('ref-' + cite);
+          if (biblioDiv) {
+            citeDiv.innerHTML = biblioDiv.innerHTML;
+          }
+          popup.appendChild(citeDiv);
+        });
+        return popup.innerHTML;
+      });
+    }
+  }
+});
+</script>
+</div> <!-- /content -->
+
+
+
+</body></html>
