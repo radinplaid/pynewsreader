@@ -47,6 +47,7 @@ def getnews():
     pnr = PyNewsReader()
     news = []
     all_links = []
+    only_unread = None
 
     args = request.args.to_dict()
     if 'search' in args:
@@ -54,14 +55,17 @@ def getnews():
         print(f"Min Date: {args['min_date']}")
         print(f"Max Date: {args['max_date']}")
         print(f"Search: {args['search']}")
+        print(f"Unread: {args['unread']}")
+        if args['unread'] == 'true':
+            only_unread = False
 
     if 'search' in args:
         if args['search']!="null" and args['search'] != "":
             dat = pnr._search_entries(args['search'])
         else:
-            dat = pnr._get_entries(limit=None, read=None)
+            dat = pnr._get_entries(limit=None, read=only_unread)
     else:
-        dat = pnr._get_entries(limit=None, read=None)
+        dat = pnr._get_entries(limit=None, read=only_unread)
 
     for i in dat:
         article_date = i.added

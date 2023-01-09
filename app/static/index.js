@@ -26,6 +26,7 @@ const vm = new Vue({ // vm is our Vue instance's name for consistency.
 		dates: ['2022-01-01', new Date().toISOString().slice(0, 10)],
 		menu: false,
 		modal: false,
+		unread_switch: true,
 		menu2: false,	}),
 	methods: {
 		greet: function (event) {
@@ -90,7 +91,7 @@ const vm = new Vue({ // vm is our Vue instance's name for consistency.
 			console.log(this.category);
 			console.log(this.dates);
 			axios
-				.get("http://localhost:5000/getnews?search=" + this.search + "&categories=" + this.category + "&min_date=" + this.dates[0] + "&max_date=" + this.dates[1])
+				.get("http://localhost:5000/getnews?search=" + this.search + "&unread=" + this.unread_switch+ "&categories=" + this.category + "&min_date=" + this.dates[0] + "&max_date=" + this.dates[1])
 				.then(response => (this.news = response.data))
 		}
 	},
