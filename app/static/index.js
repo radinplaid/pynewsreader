@@ -68,6 +68,23 @@ const vm = new Vue({ // vm is our Vue instance's name for consistency.
 			event.stopPropagation();
 
 		},
+		update: function (event) {
+			axios
+				.get("/update")
+				.then(function (response) {
+					if (response.status == 200) {
+						vm.snackbar = true;
+						vm.status_text = "Update Success! Refresh Page!";
+					}
+				})
+				.catch((error) => {
+					// eslint-disable-next-line
+					console.error(error);
+					vm.snack_failure();
+				});
+			event.preventDefault();
+			event.stopPropagation();
+		},
 		favouriteSource: function (event) {
 			const source = this.source[0][0];
 			axios

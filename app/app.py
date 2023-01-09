@@ -35,6 +35,11 @@ def ignore_source():
 def favourite_source():
     pass
 
+@app.route('/update', methods=['GET'])
+def update():
+    pnr = PyNewsReader()
+    pnr.update()
+    return jsonify(True)
 
 @app.route('/feeds', methods=['GET'])
 def feeds():
@@ -51,11 +56,11 @@ def getnews():
 
     args = request.args.to_dict()
     if 'search' in args:
-        print(f"Categories: {args['categories'].split(',')}")
-        print(f"Min Date: {args['min_date']}")
-        print(f"Max Date: {args['max_date']}")
-        print(f"Search: {args['search']}")
-        print(f"Unread: {args['unread']}")
+        # print(f"Categories: {args['categories'].split(',')}")
+        # print(f"Min Date: {args['min_date']}")
+        # print(f"Max Date: {args['max_date']}")
+        # print(f"Search: {args['search']}")
+        # print(f"Unread: {args['unread']}")
         if args['unread'] == 'true':
             only_unread = False
 
@@ -72,8 +77,8 @@ def getnews():
         if i.published is not None:
             article_date = i.published
         if 'min_date' in args:
-            print(f"Feed Name {pnr._feed_names[i.feed.url] }")
-            print(f"Feed list {args['categories'].split(',')}")
+            # print(f"Feed Name {pnr._feed_names[i.feed.url] }")
+            # print(f"Feed list {args['categories'].split(',')}")
             selected_feeds = args['categories'].split(',')
             if pnr._feed_names[i.feed.url] in selected_feeds or i.feed.title in selected_feeds:
                 if article_date >= date_parse(args['min_date']).replace(tzinfo=pytz.UTC):
