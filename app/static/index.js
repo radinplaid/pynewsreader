@@ -27,25 +27,26 @@ const vm = new Vue({ // vm is our Vue instance's name for consistency.
 		menu: false,
 		modal: false,
 		unread_switch: true,
-		menu2: false,	}),
+		menu2: false,
+	}),
 	methods: {
-		greet: function (event) {
-			axios.get(url)
-				.then(function (response) {
-					if (response.status == 200) {
-						vm.snackbar = true;
-						vm.status_text = "Success";
-					} else {
-						vm.snackbar = true;
-						vm.status_text = "Failure";
-					}
-				})
-				.catch((error) => {
-					// eslint-disable-next-line
-					console.error(error);
-					vm.snack_failure();
-				});
-		},
+		// greet: function (event) {
+		// 	axios.get(url)
+		// 		.then(function (response) {
+		// 			if (response.status == 200) {
+		// 				vm.snackbar = true;
+		// 				vm.status_text = "Success";
+		// 			} else {
+		// 				vm.snackbar = true;
+		// 				vm.status_text = "Failure";
+		// 			}
+		// 		})
+		// 		.catch((error) => {
+		// 			// eslint-disable-next-line
+		// 			console.error(error);
+		// 			vm.snack_failure();
+		// 		});
+		// },
 		created() {
 			this.getMessage();
 		},
@@ -108,14 +109,17 @@ const vm = new Vue({ // vm is our Vue instance's name for consistency.
 			console.log(this.category);
 			console.log(this.dates);
 			axios
-				.get("/getnews?search=" + this.search + "&unread=" + this.unread_switch+ "&categories=" + this.category + "&min_date=" + this.dates[0] + "&max_date=" + this.dates[1])
+				.get("/getnews?search=" + this.search + "&unread=" + this.unread_switch + "&categories=" + this.category + "&min_date=" + this.dates[0] + "&max_date=" + this.dates[1])
 				.then(response => (this.news = response.data))
 		}
 	},
 	mounted() {
 		axios
-			.get("/getnews")
+			.get("/getnews?unread=true")
 			.then(response => (this.news = response.data));
+
+	},
+	created() {
 		axios
 			.get("/feeds")
 			.then(response => (this.categories = response.data));

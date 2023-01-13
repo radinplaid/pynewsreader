@@ -2,13 +2,13 @@
 import datetime
 import random
 
-from dateutil.parser import parse as date_parse
 import pytz
+from dateutil.parser import parse as date_parse
 from flask import Flask, jsonify, redirect, render_template, request
 
 from pynewsreader.core import PyNewsReader
 
-LIMIT = 50
+LIMIT = 30
 
 app = Flask(__name__)
 
@@ -35,11 +35,13 @@ def ignore_source():
 def favourite_source():
     pass
 
+
 @app.route('/update', methods=['GET'])
 def update():
     pnr = PyNewsReader()
     pnr.update()
     return jsonify(True)
+
 
 @app.route('/feeds', methods=['GET'])
 def feeds():
@@ -52,7 +54,7 @@ def getnews():
     pnr = PyNewsReader()
     news = []
     all_links = []
-    only_unread = None
+    only_unread = False
 
     args = request.args.to_dict()
     if 'search' in args:
@@ -61,11 +63,11 @@ def getnews():
         # print(f"Max Date: {args['max_date']}")
         # print(f"Search: {args['search']}")
         # print(f"Unread: {args['unread']}")
-        if args['unread'] == 'true':
-            only_unread = False
+        if args['unread'] == 'false':
+            only_unread = None
 
     if 'search' in args:
-        if args['search']!="null" and args['search'] != "":
+        if args['search'] != "null" and args['search'] != "":
             dat = pnr._search_entries(args['search'])
         else:
             dat = pnr._get_entries(limit=None, read=only_unread)
@@ -110,6 +112,5 @@ def getnews():
                 })
             if len(news) >= LIMIT:
                 return jsonify(news)
-
 
     return jsonify(news)
