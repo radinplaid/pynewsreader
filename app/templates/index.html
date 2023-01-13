@@ -77,7 +77,7 @@
         <template>
           <v-row dense>
             <v-hover v-for="i in news" v-slot="{ hover }" v-bind:key="i.link">
-              <v-card :href="i.link" target="_blank" class="mx-auto my-2 d-flex flex-column" width="440"
+              <v-card :href="i.link" target="_blank" class="mx-auto my-2 d-flex flex-column" width="400"
                 :elevation="hover ? 4 : 2" :class="{ 'on-hover': hover }">
                 <v-card-title style="word-break: break-word;">
                   <v-row>

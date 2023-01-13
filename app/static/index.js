@@ -75,7 +75,10 @@ const vm = new Vue({ // vm is our Vue instance's name for consistency.
 				.then(function (response) {
 					if (response.status == 200) {
 						vm.snackbar = true;
-						vm.status_text = "Update Success! Refresh Page!";
+						vm.status_text = "Update Success!";
+						axios
+							.get("/getnews?unread=" + vm.unread_switch + "&min_date=" + vm.dates[0] + "&max_date=" + vm.dates[1])
+							.then(response => (vm.news = response.data));
 					}
 				})
 				.catch((error) => {
@@ -115,7 +118,7 @@ const vm = new Vue({ // vm is our Vue instance's name for consistency.
 	},
 	mounted() {
 		axios
-			.get("/getnews?unread=true")
+			.get("/getnews?unread=" + this.unread_switch + "&min_date=" + this.dates[0] + "&max_date=" + this.dates[1])
 			.then(response => (this.news = response.data));
 
 	},

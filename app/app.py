@@ -8,7 +8,7 @@ from flask import Flask, jsonify, redirect, render_template, request
 
 from pynewsreader.core import PyNewsReader
 
-LIMIT = 30
+LIMIT = 4
 
 app = Flask(__name__)
 
@@ -66,7 +66,7 @@ def getnews():
         if args['unread'] == 'false':
             only_unread = None
 
-    if 'search' in args:
+    if 'search' in args and args['search']!='null' and args['search'] > 0:
         if args['search'] != "null" and args['search'] != "":
             dat = pnr._search_entries(args['search'])
         else:
@@ -81,7 +81,10 @@ def getnews():
         if 'min_date' in args:
             # print(f"Feed Name {pnr._feed_names[i.feed.url] }")
             # print(f"Feed list {args['categories'].split(',')}")
-            selected_feeds = args['categories'].split(',')
+            if 'categories' in args:
+                selected_feeds = args['categories'].split(',')
+            else:
+                selected_feeds = pnr.feeds()
             if pnr._feed_names[i.feed.url] in selected_feeds or i.feed.title in selected_feeds:
                 if article_date >= date_parse(args['min_date']).replace(tzinfo=pytz.UTC):
                     if article_date <= date_parse(args['max_date']).replace(tzinfo=pytz.UTC)+datetime.timedelta(days=1):
