@@ -13,6 +13,7 @@ import fire
 import reader
 import rich
 from bs4 import BeautifulSoup
+from fastcore.basics import patch_to
 from rich import print
 from rich.console import Console
 from rich.panel import Panel
@@ -126,12 +127,6 @@ class PyNewsReader:
             if len(displayed_links) == limit:
                 return
 
-    def _search_to_entry(self, search_result):
-        """For a given `reader` search result return the corresponding `reader.Entry`"""
-        for i in self._reader.get_entries():
-            if i.id == search_result.id and i.feed_url == search_result.feed_url:
-                return i
-
     def _get_feed_title(self, url: str):
         """Get display title for pynewsreader feed"""
         if url in self._feed_names and self._feed_names[url] is not None:
@@ -168,40 +163,6 @@ class PyNewsReader:
                     print(f"Marking entry as important: {i.title}")
                     self._reader.mark_entry_as_important(i)
 
-    def _add_to_blacklist(self, blacklist_string: str):
-        """Add entry to blacklist"""
-        if blacklist_string not in self._title_blacklist:
-            self._title_blacklist.append(blacklist_string)
-            with open(self._dbfolder / "title_blacklist.json", "wt") as myfile:
-                json.dump(self._title_blacklist, myfile)
-
-    def _remove_from_blacklist(self, blacklist_string: str):
-        """Remove entry from blacklist"""
-        if blacklist_string in self._title_blacklist:
-            self._title_blacklist.remove(blacklist_string)
-            with open(self._dbfolder / "title_blacklist.json", "wt") as myfile:
-                json.dump(self._title_blacklist, myfile)
-
-    def _add_to_whitelist(self, whitelist_string: str):
-        """Add entry to whitelist"""
-        if whitelist_string not in self._title_whitelist:
-            self._title_whitelist.append(whitelist_string)
-            with open(self._dbfolder / "title_whitelist.json", "wt") as myfile:
-                json.dump(self._title_whitelist, myfile)
-            for entry in self._get_entries(limit=None):
-                if whitelist_string in entry.title:
-                    self._reader.mark_entry_as_important(entry)
-
-    def _remove_from_whitelist(self, whitelist_string: str):
-        """Remove whitelist entry"""
-        if whitelist_string in self._title_whitelist:
-            self._title_whitelist.remove(whitelist_string)
-            with open(self._dbfolder / "title_whitelist.json", "wt") as myfile:
-                json.dump(self._title_whitelist, myfile)
-            for entry in self._get_entries(limit=None):
-                if whitelist_string in entry.title:
-                    self._reader.mark_entry_as_unimportant(entry)
-
     def _mark_important(self, entry: reader.Entry = None):
         """Mark entry as important"""
         if entry is not None:
@@ -220,88 +181,166 @@ class PyNewsReader:
         """Remove tag from entry"""
         self._reader.delete_tag(entry, tag_key)
 
-    def add_feed(self, feed: Union[Feed, str]):
-        """Add feed to pynewsreader
+# %% ../00_core.ipynb 6
+@patch_to(PyNewsReader)
+def blacklist_add(self, blacklist_string: str):
+    """Add entry to blacklist"""
+    if blacklist_string not in self._title_blacklist:
+        self._title_blacklist.append(blacklist_string)
+        with open(self._dbfolder / "title_blacklist.json", "wt") as myfile:
+            json.dump(self._title_blacklist, myfile)
 
-        Args:
-            feed (Feed): pynewsreader Feed to add
-        """
-        if isinstance(feed, Feed):
-            self._feed_names[feed.url] = feed.name
-            self._reader.add_feed(feed.url, exist_ok=True)
-        elif isinstance(feed, str):
-            self._reader.add_feed(feed, exist_ok=True)
-        else:
-            raise Exception("Must be str or Feed type to add")
 
-        # Save names to file
-        with open(self._dbfolder / "feed_names.json", "wt") as myfile:
-            json.dump(self._feed_names, myfile)
+@patch_to(PyNewsReader)
+def blacklist_remove(self, blacklist_string: str):
+    """Remove entry from blacklist"""
+    if blacklist_string in self._title_blacklist:
+        self._title_blacklist.remove(blacklist_string)
+        with open(self._dbfolder / "title_blacklist.json", "wt") as myfile:
+            json.dump(self._title_blacklist, myfile)
 
-    def remove_feed(self, feed: Union[Feed, str]):
-        """Remove feed from pynewsreader instance
+@patch_to(PyNewsReader)
+def blacklist_show(self):
+    """Show blacklist"""
+    print(self._title_blacklist)
+  
 
-        Args:
-            feed (Union[Feed, str]): Feed to remove
-        """
+# %% ../00_core.ipynb 7
+@patch_to(PyNewsReader)
+def whitelist_add(self, whitelist_string: str):
+    """Add entry to whitelist"""
+    if whitelist_string not in self._title_whitelist:
+        self._title_whitelist.append(whitelist_string)
+        with open(self._dbfolder / "title_whitelist.json", "wt") as myfile:
+            json.dump(self._title_whitelist, myfile)
+        for entry in self._get_entries(limit=None):
+            if whitelist_string in entry.title:
+                self._reader.mark_entry_as_important(entry)
 
-        if isinstance(feed, Feed):
-            self._reader.delete_feed(feed.url)
-        elif isinstance(feed, str):
-            self._reader.delete_feed(feed)
-        else:
-            raise Exception(TypeError)
 
-    def feeds(self):
-        """List pynewsreader feeds
+@patch_to(PyNewsReader)
+def whitelist_remove(self, whitelist_string: str):
+    """Remove whitelist entry"""
+    if whitelist_string in self._title_whitelist:
+        self._title_whitelist.remove(whitelist_string)
+        with open(self._dbfolder / "title_whitelist.json", "wt") as myfile:
+            json.dump(self._title_whitelist, myfile)
+        for entry in self._get_entries(limit=None):
+            if whitelist_string in entry.title:
+                self._reader.mark_entry_as_unimportant(entry)
+                
+@patch_to(PyNewsReader)
+def whitelist_show(self):
+    """Show whitelist"""
+    print(self._title_whitelist)
+  
 
-        Returns:
-            List[str]: List of names of current pynewsreader feeds
-        """
-        return [self._get_feed_title(i.url) for i in self._reader.get_feeds()]
+# %% ../00_core.ipynb 8
+@patch_to(PyNewsReader)
+def update(self):
+    """Update feeds and search"""
+    self._reader.update_feeds()
+    self._reader.update_search()
+    if len(self._title_blacklist) > 0:
+        self._mark_matching_entries_as_read(self._title_blacklist)
+    if len(self._title_whitelist) > 0:
+        self._mark_matching_entries_as_important(self._title_whitelist)
 
-    def update(self):
-        """Update feeds and search"""
-        self._reader.update_feeds()
-        self._reader.update_search()
-        if len(self._title_blacklist) > 0:
-            self._mark_matching_entries_as_read(self._title_blacklist)
-        if len(self._title_whitelist) > 0:
-            self._mark_matching_entries_as_important(self._title_whitelist)
+# %% ../00_core.ipynb 9
+@patch_to(PyNewsReader)
+def add_feed(self, feed: Union[Feed, str]):
+    """Add feed to pynewsreader
 
-    def show(
-        self,
-        limit: int = 6,
-        read: bool = False,
-        important: bool = None,
-        mark_as_read: bool = True,
-    ):
-        """Pretty print entries
+    Args:
+        feed (Feed): pynewsreader Feed to add
+    """
+    if isinstance(feed, Feed):
+        self._feed_names[feed.url] = feed.name
+        self._reader.add_feed(feed.url, exist_ok=True)
+    elif isinstance(feed, str):
+        self._reader.add_feed(feed, exist_ok=True)
+    else:
+        raise Exception("Must be str or Feed type to add")
 
-        Args:
-            limit (int, optional): Number of entries to show. Defaults to 5.
-            read (bool, optional): Show read entries (True), unread entries (False), or all entries (None). Defaults to None.
-            mark_as_read (bool, optional): Mark displayed entries as read. Defaults to False.
-        """
-        self._print_entries(
-            self._get_entries(read=read, important=important, limit=limit * 2),
-            limit=limit,
-            mark_as_read=mark_as_read,
-        )
+    # Save names to file
+    with open(self._dbfolder / "feed_names.json", "wt") as myfile:
+        json.dump(self._feed_names, myfile)
 
-    def search(self, query: str, mark_as_read: bool = True, limit: int = 10):
-        """Search entries and pretty print results
 
-        Args:
-            query (str): Search query
-            mark_as_read (bool, optional): Mark results as read? Defaults to True.
-        """
-        self._print_entries(
-            [self._search_to_entry(i) for i in self._reader.search_entries(query)],
-            mark_as_read=mark_as_read,
-            limit=limit,
-        )
+@patch_to(PyNewsReader)
+def remove_feed(self, feed: Union[Feed, str]):
+    """Remove feed from pynewsreader instance
 
-# %% ../00_core.ipynb 39
+    Args:
+        feed (Union[Feed, str]): Feed to remove
+    """
+
+    if isinstance(feed, Feed):
+        self._reader.delete_feed(feed.url)
+    elif isinstance(feed, str):
+        self._reader.delete_feed(feed)
+    else:
+        raise Exception(TypeError)
+
+
+@patch_to(PyNewsReader)
+def feeds(self):
+    """List pynewsreader feeds
+
+    Returns:
+        List[str]: List of names of current pynewsreader feeds
+    """
+    return [self._get_feed_title(i.url) for i in self._reader.get_feeds()]
+
+# %% ../00_core.ipynb 10
+@patch_to(PyNewsReader)
+def show(
+    self,
+    limit: int = 6,
+    read: bool = False,
+    important: bool = None,
+    mark_as_read: bool = True,
+):
+    """Pretty print entries
+
+    Args:
+        limit (int, optional): Number of entries to show. Defaults to 5.
+        read (bool, optional): Show read entries (True), unread entries (False), or all entries (None). Defaults to None.
+        mark_as_read (bool, optional): Mark displayed entries as read. Defaults to False.
+    """
+    self._print_entries(
+        self._get_entries(read=read, important=important, limit=limit * 2),
+        limit=limit,
+        mark_as_read=mark_as_read,
+    )
+
+# %% ../00_core.ipynb 11
+@patch_to(PyNewsReader)
+def search(self, query: str, mark_as_read: bool = True, limit: int = 10):
+    """Search entries and pretty print results
+
+    Args:
+        query (str): Search query
+        mark_as_read (bool, optional): Mark results as read? Defaults to True.
+    """
+    self._print_entries(
+        [self._search_to_entry(i) for i in self._reader.search_entries(query)],
+        mark_as_read=mark_as_read,
+        limit=limit,
+    )
+
+
+@patch_to(PyNewsReader)
+def _search_to_entry(self, search_result):
+    """For a given `reader` search result return the corresponding `reader.Entry`"""
+    for i in self._reader.get_entries():
+        if i.id == search_result.id and i.feed_url == search_result.feed_url:
+            return i
+
+# %% ../00_core.ipynb 46
 def main():
     fire.Fire(PyNewsReader)
+
+# %% ../00_core.ipynb 47
+if __name__ == "__main__":
+    main()
