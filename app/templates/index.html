@@ -40,6 +40,10 @@
         </template>
 
         <template>
+          <v-switch v-model="important_switch" label="Show Only Important" v-on:change="filter"></v-switch>
+        </template>
+        
+        <template>
           <v-switch v-model="unread_switch" label="Show Only Unread" v-on:change="filter"></v-switch>
         </template>
 

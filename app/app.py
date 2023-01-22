@@ -55,6 +55,7 @@ def getnews():
     news = []
     all_links = []
     only_unread = False
+    only_important = False
 
     args = request.args.to_dict()
     if 'search' in args:
@@ -65,14 +66,19 @@ def getnews():
         # print(f"Unread: {args['unread']}")
         if args['unread'] == 'false':
             only_unread = None
+        if 'important' in args:
+            if args['important'] == 'false':
+                only_important = None
+            else:
+                only_important = True
 
     if 'search' in args and args['search']!='null' and args['search'] > 0:
         if args['search'] != "null" and args['search'] != "":
             dat = pnr._search_entries(args['search'])
         else:
-            dat = pnr._get_entries(limit=None, read=only_unread)
+            dat = pnr._get_entries(limit=None, important = only_important, read=only_unread)
     else:
-        dat = pnr._get_entries(limit=None, read=only_unread)
+        dat = pnr._get_entries(limit=None, important = only_important, read=only_unread)
 
     for i in dat:
         article_date = i.added
