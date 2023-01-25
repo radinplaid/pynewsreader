@@ -91,6 +91,44 @@ const vm = new Vue({ // vm is our Vue instance's name for consistency.
 			event.preventDefault();
 			event.stopPropagation();
 		},
+		mark_important: function (event) {
+			console.log(this.link);
+			const link = this.link[0][0];
+			axios
+				.get("/mark_important?link=" + link)
+				.then(function (response) {
+					if (response.status == 200) {
+						vm.snackbar = true;
+						vm.status_text = "Marked url as important: " + link;
+					}
+				})
+				.catch((error) => {
+					// eslint-disable-next-line
+					console.error(error);
+					vm.snack_failure();
+				});
+			event.preventDefault();
+			event.stopPropagation();
+		},
+		mark_unimportant: function (event) {
+			console.log(this.link);
+			const link = this.link[0][0];
+			axios
+				.get("/mark_unimportant?link=" + link)
+				.then(function (response) {
+					if (response.status == 200) {
+						vm.snackbar = true;
+						vm.status_text = "Marked url as unimportant: " + link;
+					}
+				})
+				.catch((error) => {
+					// eslint-disable-next-line
+					console.error(error);
+					vm.snack_failure();
+				});
+			event.preventDefault();
+			event.stopPropagation();
+		},
 		filter() {
 			console.log(this.search);
 			console.log(this.category);

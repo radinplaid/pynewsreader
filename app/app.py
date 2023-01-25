@@ -43,6 +43,28 @@ def update():
     return jsonify(True)
 
 
+@app.route('/mark_important', methods=['GET'])
+def mark_important():
+    pnr = PyNewsReader()
+    args = request.args.to_dict()
+    if 'link' in args:
+        pnr._mark_entries_important_by_url(args['link'])
+        return jsonify(True)
+    else:
+        return jsonify(False)
+
+
+@app.route('/mark_unimportant', methods=['GET'])
+def mark_unimportant():
+    pnr = PyNewsReader()
+    args = request.args.to_dict()
+    if 'link' in args:
+        pnr._mark_entries_unimportant_by_url(args['link'])
+        return jsonify(True)
+    else:
+        return jsonify(False)
+
+
 @app.route('/feeds', methods=['GET'])
 def feeds():
     pnr = PyNewsReader()
@@ -72,13 +94,15 @@ def getnews():
             else:
                 only_important = True
 
-    if 'search' in args and args['search']!='null' and args['search'] > 0:
+    if 'search' in args and args['search'] != 'null' and args['search'] > 0:
         if args['search'] != "null" and args['search'] != "":
             dat = pnr._search_entries(args['search'])
         else:
-            dat = pnr._get_entries(limit=None, important = only_important, read=only_unread)
+            dat = pnr._get_entries(
+                limit=None, important=only_important, read=only_unread)
     else:
-        dat = pnr._get_entries(limit=None, important = only_important, read=only_unread)
+        dat = pnr._get_entries(
+            limit=None, important=only_important, read=only_unread)
 
     for i in dat:
         article_date = i.added

@@ -117,7 +117,7 @@
   <v-card-actions class="mt-auto">
     <v-row>
       <v-col>
-        <v-btn dark @click="snackbar = true" @click.prevent="greet" text elevation="2" color="red darken-4">
+        <v-btn dark @click="link = [[ i.link ]]" @click.prevent="mark_unimportant" text elevation="2" color="red darken-4">
           <v-icon left>
             mdi-thumb-down
           </v-icon>
@@ -125,7 +125,7 @@
         </v-btn>
       </v-col>
       <v-col class="text-right">
-        <v-btn dark @click="snackbar = true" @click.prevent="greet" text elevation="2" color="green darken-3">
+        <v-btn dark @click="link = [[ i.link ]]" @click.default="mark_important" text elevation="2" color="green darken-3">
           <v-icon left>
             mdi-thumb-up
           </v-icon>

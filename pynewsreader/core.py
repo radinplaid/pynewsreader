@@ -319,7 +319,7 @@ def show(
 def search(self, query: str, mark_as_read: bool = True, limit: int = 10):
     """Search entries and pretty print results
 
-    Args:
+    Args:a
         query (str): Search query
         mark_as_read (bool, optional): Mark results as read? Defaults to True.
     """
@@ -337,10 +337,25 @@ def _search_to_entry(self, search_result):
         if i.id == search_result.id and i.feed_url == search_result.feed_url:
             return i
 
-# %% ../00_core.ipynb 46
+# %% ../00_core.ipynb 12
+@patch_to(PyNewsReader)
+def _mark_entries_important_by_url(self, url: str):
+    matches = [i for i in self._reader.get_entries() if i.link==url]
+    for article in matches:
+        self._reader.mark_entry_as_important(article)
+
+
+@patch_to(PyNewsReader)
+def _mark_entries_unimportant_by_url(self, url: str):
+    matches = [i for i in self._reader.get_entries() if i.link==url]
+    for article in matches:
+        self._reader.mark_entry_as_unimportant(article)
+
+
+# %% ../00_core.ipynb 47
 def main():
     fire.Fire(PyNewsReader)
 
-# %% ../00_core.ipynb 47
+# %% ../00_core.ipynb 48
 if __name__ == "__main__":
     main()
