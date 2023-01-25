@@ -82,11 +82,11 @@
           <v-row dense>
             <v-hover v-for="i in news" v-slot="{ hover }" v-bind:key="i.link">
               <v-card :href="i.link" target="_blank" class="mx-auto my-2 d-flex flex-column" width="400"
-                :elevation="hover ? 4 : 2" :class="{ 'on-hover': hover }">
+                :elevation="hover ? 2 : 1" :class="{ 'on-hover': hover }">
                 <v-card-title style="word-break: break-word;">
                   <v-row>
                     <v-col md="auto">
-                      <img style="max-width:100px; max-height: 100px;" alt=""
+                      <img style="max-width:64px; max-height: 64px;" alt=""
                         :src="'https://t1.gstatic.com/faviconV2?client=SOCIAL&type=FAVICON&fallback_opts=TYPE,SIZE,URL&size=64&url='+i.source_url">
                     </v-col>
                     <v-col>
@@ -113,6 +113,12 @@
     <div>
       [[ i.topic ]]
     </div>
+    <v-icon
+      large
+      color="green darken-2"
+    >
+      [[ i.icon ]]
+    </v-icon>
   </v-card-text>
   <v-card-actions class="mt-auto">
     <v-row>

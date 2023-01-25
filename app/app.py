@@ -127,7 +127,8 @@ def getnews():
                                 "published": str(article_date),
                                 "published_epoch": article_date.timestamp(),
                                 "source_url": i.feed_url,
-                                "source_name": i.feed.title
+                                "source_name": i.feed.title,
+                                "icon": "mdi-bell" if i.important else ""
                             })
                         if len(news) >= LIMIT:
                             return jsonify(news)
@@ -141,7 +142,8 @@ def getnews():
                     "published": str(i.added),
                     "published_epoch": i.added.timestamp(),
                     "source_url": i.feed_url,
-                    "source_name": i.feed.title
+                    "source_name": i.feed.title,
+                    "icon": "mdi-bell" if i.important else ""
                 })
             if len(news) >= LIMIT:
                 return jsonify(news)

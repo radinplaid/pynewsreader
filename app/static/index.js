@@ -136,12 +136,15 @@ const vm = new Vue({ // vm is our Vue instance's name for consistency.
 			axios
 				.get("/getnews?search=" + this.search + "&important=" + this.important_switch + "&unread=" + this.unread_switch + "&categories=" + this.category + "&min_date=" + this.dates[0] + "&max_date=" + this.dates[1])
 				.then(response => (this.news = response.data))
+			console.log(this.news);
+
 		}
 	},
 	mounted() {
 		axios
 			.get("/getnews?search=" + this.search + "&unread=" + this.unread_switch + "&important=" + this.important_switch + "&min_date=" + this.dates[0] + "&max_date=" + this.dates[1])
 			.then(response => (this.news = response.data));
+		console.log(this.news);
 
 	},
 	created() {
