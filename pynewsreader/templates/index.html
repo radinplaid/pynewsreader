@@ -42,7 +42,7 @@
         <template>
           <v-switch v-model="important_switch" label="Show Only Important" v-on:change="filter"></v-switch>
         </template>
-        
+
         <template>
           <v-switch v-model="unread_switch" label="Show Only Unread" v-on:change="filter"></v-switch>
         </template>
@@ -50,7 +50,7 @@
         <template>
           <v-btn prepend-icon="mdi-refresh" variant="tonal" v-on:click="update">
             Update
-          </v-btn>        
+          </v-btn>
         </template>
 
         <template>
@@ -84,12 +84,12 @@
               <v-card :href="i.link" target="_blank" class="mx-auto my-2 d-flex flex-column" width="400"
                 :elevation="hover ? 2 : 1" :class="{ 'on-hover': hover }">
                 <v-card-title style="word-break: break-word;">
-                  <v-row>
-                    <v-col md="auto">
+                  <v-row no-gutters>
+                    <v-col cols="2">
                       <img style="max-width:64px; max-height: 64px;" alt=""
                         :src="'https://t1.gstatic.com/faviconV2?client=SOCIAL&type=FAVICON&fallback_opts=TYPE,SIZE,URL&size=64&url='+i.source_url">
                     </v-col>
-                    <v-col>
+                    <v-col cols="10">
                       [[ i.title ]]
                     </v-col>
                   </v-row>
@@ -113,17 +113,18 @@
     <div>
       [[ i.topic ]]
     </div>
-    <v-icon
+    <!-- <v-icon
       large
       color="green darken-2"
     >
       [[ i.icon ]]
-    </v-icon>
+    </v-icon> -->
   </v-card-text>
   <v-card-actions class="mt-auto">
     <v-row>
       <v-col>
-        <v-btn dark @click="link = [[ i.link ]]" @click.prevent="mark_unimportant" text elevation="2" color="red darken-4">
+        <v-btn dark @click="link = [[ i.link ]]" @click.prevent="mark_unimportant" text elevation="2"
+          color="red darken-4">
           <v-icon left>
             mdi-thumb-down
           </v-icon>
@@ -131,7 +132,8 @@
         </v-btn>
       </v-col>
       <v-col class="text-right">
-        <v-btn dark @click="link = [[ i.link ]]" @click.default="mark_important" text elevation="2" color="green darken-3">
+        <v-btn dark @click="link = [[ i.link ]]" @click.default="mark_important" text elevation="2"
+          color="green darken-3">
           <v-icon left>
             mdi-thumb-up
           </v-icon>
