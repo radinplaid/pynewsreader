@@ -1,1 +1,0 @@
-Sitemap: https://fastai.github.io/nbdev-hello-world/sitemap.xml

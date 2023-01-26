@@ -149,3 +149,11 @@ def getnews():
                 return jsonify(news)
 
     return jsonify(news)
+    
+def main():
+    app.run()
+    
+if __name__== "__main__":
+    main()
+
+
