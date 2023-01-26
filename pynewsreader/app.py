@@ -2,13 +2,14 @@
 import datetime
 import random
 
+import fire
 import pytz
 from dateutil.parser import parse as date_parse
-from flask import Flask, jsonify, redirect, render_template, request
+from flask import Flask, jsonify, render_template, request
 
 from pynewsreader.core import PyNewsReader
 
-LIMIT = 4
+LIMIT = 40
 
 app = Flask(__name__)
 
@@ -149,11 +150,15 @@ def getnews():
                 return jsonify(news)
 
     return jsonify(news)
-    
+
+
+def run_app(host="127.0.0.1", port=5000):
+    app.run(host=host, port=port)
+
+
 def main():
-    app.run()
-    
-if __name__== "__main__":
+    fire.Fire(run_app)
+
+
+if __name__ == "__main__":
     main()
-
-
