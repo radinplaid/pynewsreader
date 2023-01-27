@@ -20,6 +20,9 @@ const vm = new Vue({ // vm is our Vue instance's name for consistency.
 		source: null,
 		show: true,
 		news: null,
+		drawer: false,
+		group: null,
+		limit: 40,
 		categories: [],
 		category: [],
 		datemenu: false,
@@ -61,7 +64,7 @@ const vm = new Vue({ // vm is our Vue instance's name for consistency.
 						vm.snackbar = true;
 						vm.status_text = "Update Success!";
 						axios
-							.get("/getnews?important=" + vm.important_switch + "&unread=" + vm.unread_switch + "&min_date=" + vm.dates[0] + "&max_date=" + vm.dates[1])
+							.get("/getnews?limit=" + vm.limit + "&important=" + vm.important_switch + "&unread=" + vm.unread_switch + "&min_date=" + vm.dates[0] + "&max_date=" + vm.dates[1])
 							.then(response => (vm.news = response.data));
 					}
 				})
@@ -134,7 +137,7 @@ const vm = new Vue({ // vm is our Vue instance's name for consistency.
 			console.log(this.category);
 			console.log(this.dates);
 			axios
-				.get("/getnews?search=" + this.search + "&important=" + this.important_switch + "&unread=" + this.unread_switch + "&categories=" + this.category + "&min_date=" + this.dates[0] + "&max_date=" + this.dates[1])
+				.get("/getnews?limit=" + this.limit + "&search=" + this.search + "&important=" + this.important_switch + "&unread=" + this.unread_switch + "&categories=" + this.category + "&min_date=" + this.dates[0] + "&max_date=" + this.dates[1])
 				.then(response => (this.news = response.data))
 			console.log(this.news);
 
@@ -142,7 +145,7 @@ const vm = new Vue({ // vm is our Vue instance's name for consistency.
 	},
 	mounted() {
 		axios
-			.get("/getnews?search=" + this.search + "&unread=" + this.unread_switch + "&important=" + this.important_switch + "&min_date=" + this.dates[0] + "&max_date=" + this.dates[1])
+			.get("/getnews?limit=" + this.limit + "&search=" + this.search + "&unread=" + this.unread_switch + "&important=" + this.important_switch + "&min_date=" + this.dates[0] + "&max_date=" + this.dates[1])
 			.then(response => (this.news = response.data));
 		console.log(this.news);
 

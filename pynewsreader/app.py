@@ -9,8 +9,6 @@ from flask import Flask, jsonify, render_template, request
 
 from pynewsreader.core import PyNewsReader
 
-LIMIT = 40
-
 app = Flask(__name__)
 
 
@@ -81,6 +79,12 @@ def getnews():
     only_important = False
 
     args = request.args.to_dict()
+
+    if 'limit' in args:
+        LIMIT = int(args['limit'])
+    else:
+        LIMIT = 40
+
     if 'search' in args:
         # print(f"Categories: {args['categories'].split(',')}")
         # print(f"Min Date: {args['min_date']}")
@@ -95,9 +99,9 @@ def getnews():
             else:
                 only_important = True
 
-    if 'search' in args and args['search'] != 'null' and args['search'] > 0:
+    if 'search' in args and args['search'] != 'null' and len(args['search']) > 0:
         if args['search'] != "null" and args['search'] != "":
-            dat = pnr._search_entries(args['search'])
+            dat = [pnr._search_to_entry(i) for i in pnr._reader.search_entries(args['search'])]
         else:
             dat = pnr._get_entries(
                 limit=None, important=only_important, read=only_unread)
