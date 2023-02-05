@@ -19,21 +19,6 @@ def index():
     })
 
 
-@app.route('/rand', methods=['GET'])
-def ping_pong():
-    return jsonify(random.random())
-
-
-@app.route('/ignore_source', methods=['GET'])
-def ignore_source():
-    pass
-
-
-@app.route('/favourite_source', methods=['GET'])
-def favourite_source():
-    pass
-
-
 @app.route('/update', methods=['GET'])
 def update():
     pnr = PyNewsReader()
@@ -82,7 +67,7 @@ def getnews():
     if 'limit' in args:
         LIMIT = int(args['limit'])
     else:
-        LIMIT = 4
+        LIMIT = 50
 
     if 'search' in args:
         if args['unread'] == 'false':

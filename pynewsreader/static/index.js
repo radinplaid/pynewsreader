@@ -12,8 +12,8 @@ const vm = new Vue({ // vm is our Vue instance's name for consistency.
 	vuetify: new Vuetify(),
 	delimiters: ['[[', ']]'],
 	data: () => ({
-		greeting: 'Hello, Vue!',
 		results: [],
+		link: null,
 		snackbar: false,
 		status_text: ``,
 		search: null,
@@ -22,7 +22,7 @@ const vm = new Vue({ // vm is our Vue instance's name for consistency.
 		news: null,
 		drawer: false,
 		group: null,
-		limit: 40,
+		limit: 50,
 		categories: [],
 		category: [],
 		datemenu: false,
@@ -30,33 +30,15 @@ const vm = new Vue({ // vm is our Vue instance's name for consistency.
 		menu: false,
 		modal: false,
 		unread_switch: true,
-        important_switch: false,
+		important_switch: false,
 		menu2: false,
 	}),
 	methods: {
 		created() {
-			this.getMessage();
-		},
-		ignoreSource: function (event) {
-			const source = this.source[0][0];
-			axios
-				.get("/ignore_source?source=" + source)
-				.then(function (response) {
-					if (response.status == 200) {
-						vm.snackbar = true;
-						vm.status_text = "Ignored Source: " + source;
-					}
-				})
-				.catch((error) => {
-					// eslint-disable-next-line
-					console.error(error);
-					vm.snack_failure();
-				});
-			event.preventDefault();
-			event.stopPropagation();
-
+			// this.getMessage();
 		},
 		update: function (event) {
+			console.log("Updating feeds");
 			axios
 				.get("/update")
 				.then(function (response) {
@@ -76,26 +58,8 @@ const vm = new Vue({ // vm is our Vue instance's name for consistency.
 			event.preventDefault();
 			event.stopPropagation();
 		},
-		favouriteSource: function (event) {
-			const source = this.source[0][0];
-			axios
-				.get("/favourite_source?source=" + source)
-				.then(function (response) {
-					if (response.status == 200) {
-						vm.snackbar = true;
-						vm.status_text = "Favourited Source: " + source;
-					}c
-				})
-				.catch((error) => {
-					// eslint-disable-next-line
-					console.error(error);
-					vm.snack_failure();
-				});
-			event.preventDefault();
-			event.stopPropagation();
-		},
 		mark_important: function (event) {
-			console.log(this.link);
+			console.log("Marking article as important: " + this.link);
 			const link = this.link[0][0];
 			axios
 				.get("/mark_important?link=" + link)
@@ -114,7 +78,7 @@ const vm = new Vue({ // vm is our Vue instance's name for consistency.
 			event.stopPropagation();
 		},
 		mark_unimportant: function (event) {
-			console.log(this.link);
+			console.log("Marking article as unimportant: " + this.link);
 			const link = this.link[0][0];
 			axios
 				.get("/mark_unimportant?link=" + link)
@@ -133,13 +97,9 @@ const vm = new Vue({ // vm is our Vue instance's name for consistency.
 			event.stopPropagation();
 		},
 		filter() {
-			console.log(this.search);
-			console.log(this.category);
-			console.log(this.dates);
 			axios
 				.get("/getnews?limit=" + this.limit + "&search=" + this.search + "&important=" + this.important_switch + "&unread=" + this.unread_switch + "&categories=" + this.category + "&min_date=" + this.dates[0] + "&max_date=" + this.dates[1])
 				.then(response => (this.news = response.data))
-			console.log(this.news);
 
 		}
 	},
@@ -147,7 +107,6 @@ const vm = new Vue({ // vm is our Vue instance's name for consistency.
 		axios
 			.get("/getnews?limit=" + this.limit + "&search=" + this.search + "&unread=" + this.unread_switch + "&important=" + this.important_switch + "&min_date=" + this.dates[0] + "&max_date=" + this.dates[1])
 			.then(response => (this.news = response.data));
-		console.log(this.news);
 
 	},
 	created() {
