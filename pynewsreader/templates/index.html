@@ -9,7 +9,7 @@
   <link rel="shortcut icon" href="{{ url_for('static', filename='favicon.ico') }}">
 </head>
 
-<script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+<script src="/static/axios.min.js"></script>
 
 
 <body>
@@ -17,7 +17,6 @@
     .v-card__text,
     .v-card__title {
       word-break: normal;
-      /* maybe !important  */
     }
   </style>
   <div id="vm">
@@ -38,22 +37,15 @@
                   <p class="mx-2 my-2 text-h5">Settings</p>
                 </v-col>
                 <v-col>
-                  <v-btn
-                  class="mx-2 my-2"
-                  style="float: right;"
-                  fab
-                  dark
-                  x-small
-                  color="primary"
-                  @click="drawer = false"
-                >
-                  <v-icon dark>
-                    mdi-close
-                  </v-icon>
-                </v-btn>
+                  <v-btn class="mx-2 my-2" style="float: right;" fab dark x-small color="primary"
+                    @click="drawer = false">
+                    <v-icon dark>
+                      mdi-close
+                    </v-icon>
+                  </v-btn>
                 </v-col>
               </v-row>
-              
+
 
               <template>
                 <v-select v-on:input="filter" v-on:blur="filter" label="Feeds" v-model="category" :items="categories"
@@ -62,53 +54,51 @@
                     <v-chip v-if="index === 0">
                       <span>[[ item ]]</span>
                     </v-chip>
-                    <span
-                      v-if="index === 1"
-                      class="grey--text text-caption"
-                    >
+                    <span v-if="index === 1" class="grey--text text-caption">
                       (+[[ category.length - 1 ]] others)
                     </span>
                   </template>
                 </v-select>
               </template>
-      
+
               <template>
-                <v-switch class="mx-2" v-model="important_switch" label="Show Only Important" v-on:change="filter"></v-switch>
+                <v-switch class="mx-2" v-model="important_switch" label="Show Only Important"
+                  v-on:change="filter"></v-switch>
               </template>
-      
+
               <template>
                 <v-switch class="mx-2" v-model="unread_switch" label="Show Only Unread" v-on:change="filter"></v-switch>
               </template>
-      
+
               <template>
                 <v-text-field class="mx-2" v-model="limit" v-on:change="filter" label="Limit" type="number"
                   i.limit></v-text-field>
               </template>
-      
+
               <template>
-                  <v-dialog ref="dialog" v-model="modal" :return-value.sync="dates" persistent width="290px">
-                    <template v-slot:activator="{ on, attrs }">
-                      <v-text-field v-model="dates" label="Date Range" prepend-icon="mdi-calendar" readonly v-bind="attrs" 
-                        v-on="on"></v-text-field>
-                    </template>
-                    <v-date-picker v-model="dates" scrollable range v-on:change="filter">
-                      <v-spacer></v-spacer>
-                      <v-btn text color="primary" @click="modal = false">
-                        Cancel
-                      </v-btn>
-                      <v-btn text color="primary" @click="$refs.dialog.save(dates)">
-                        OK
-                      </v-btn>
-                    </v-date-picker>
-                  </v-dialog>
+                <v-dialog ref="dialog" v-model="modal" :return-value.sync="dates" persistent width="290px">
+                  <template v-slot:activator="{ on, attrs }">
+                    <v-text-field v-model="dates" label="Date Range" prepend-icon="mdi-calendar" readonly v-bind="attrs"
+                      v-on="on"></v-text-field>
+                  </template>
+                  <v-date-picker v-model="dates" scrollable range v-on:change="filter">
+                    <v-spacer></v-spacer>
+                    <v-btn text color="primary" @click="modal = false">
+                      Cancel
+                    </v-btn>
+                    <v-btn text color="primary" @click="$refs.dialog.save(dates)">
+                      OK
+                    </v-btn>
+                  </v-date-picker>
+                </v-dialog>
               </template>
-      
+
               <template>
                 <v-text-field v-on:change="filter" filled prepend-inner-icon="mdi-magnify" solo name="search"
                   v-model.lazy="search" placeholder="Search"></v-text-field>
               </template>
-      
-      
+
+
               <template>
                 <v-btn prepend-icon="mdi-refresh" variant="tonal" v-on:click="update">
                   Update Feeds
@@ -201,8 +191,8 @@
 
   </v-app>
   </div>
-  <script src="https://cdn.jsdelivr.net/npm/vue@2.x/dist/vue.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/vuetify@2.x/dist/vuetify.js"></script>
+  <script src="/static/vue.js"></script>
+  <script src="/static/vuetify.js"></script>
   <script src="{{ url_for('static', filename='index.js') }}"></script>
 
 </body>
