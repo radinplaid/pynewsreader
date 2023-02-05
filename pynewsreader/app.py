@@ -48,6 +48,28 @@ def mark_unimportant():
         return jsonify(False)
 
 
+@app.route('/add_tag', methods=['GET'])
+def add_tag():
+    pnr = PyNewsReader()
+    args = request.args.to_dict()
+    if 'link' in args:
+        pnr._add_tag(args['link'])
+        return jsonify(True)
+    else:
+        return jsonify(False)
+
+
+@app.route('/remove_tag', methods=['GET'])
+def remove_tag():
+    pnr = PyNewsReader()
+    args = request.args.to_dict()
+    if 'link' in args:
+        pnr._remove_tag(args['link'])
+        return jsonify(True)
+    else:
+        return jsonify(False)
+
+
 @app.route('/feeds', methods=['GET'])
 def feeds():
     pnr = PyNewsReader()
@@ -119,7 +141,8 @@ def getnews():
                 "published_epoch": article_date.timestamp(),
                 "source_url": i.feed_url,
                 "source_name": i.feed.title,
-                "icon": "mdi-bell" if i.important else ""
+                "icon": "mdi-bell" if i.important else "",
+                "tags": "Tags: " + ', '.join(pnr._get_tags(i))
             })
         if len(news) >= LIMIT:
             return jsonify(news)
