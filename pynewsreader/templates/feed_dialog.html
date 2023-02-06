@@ -1,0 +1,22 @@
+<v-dialog v-model="feeddialog" fullscreen hide-overlay transition="dialog-bottom-transition">
+    <template v-slot:activator="{ on, attrs }">
+        <v-btn color="secondary" dark v-bind="attrs" v-on="on">
+            Edit Feeds
+        </v-btn>
+    </template>
+    <v-card>
+        <v-toolbar dark color="secondary">
+            <v-btn icon dark @click="feeddialog = false">
+                <v-icon>mdi-close</v-icon>
+            </v-btn>
+            <v-toolbar-title>Edit Feeds</v-toolbar-title>
+            <v-spacer></v-spacer>
+            <v-toolbar-items>
+                <v-btn dark text @click="feeddialog = false">
+                    Save
+                </v-btn>
+            </v-toolbar-items>
+        </v-toolbar>
+
+    </v-card>
+</v-dialog>

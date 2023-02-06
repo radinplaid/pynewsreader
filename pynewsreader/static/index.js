@@ -32,6 +32,7 @@ const vm = new Vue({ // vm is our Vue instance's name for consistency.
 		unread_switch: true,
 		important_switch: false,
 		menu2: false,
+		feeddialog: false
 	}),
 	methods: {
 		created() {
