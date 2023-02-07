@@ -103,7 +103,7 @@ def getnews():
     if 'search' in args and args['search'] != 'null' and len(args['search']) > 0:
         if args['search'] != "null" and args['search'] != "":
             dat = [pnr._reader.get_entry(
-                i) for i in pnr._reader.search_entries(args['search'])]
+                i) for i in pnr._reader.search_entries(args['search'], sort='recent')]
         else:
             dat = pnr._get_entries(
                 limit=None, important=only_important, read=only_unread)
