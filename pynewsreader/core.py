@@ -324,18 +324,11 @@ def search(self, query: str, mark_as_read: bool = True, limit: int = 10):
         mark_as_read (bool, optional): Mark results as read? Defaults to True.
     """
     self._print_entries(
-        [self._search_to_entry(i) for i in self._reader.search_entries(query)],
+        [self._reader.get_entry(i) for i in self._reader.search_entries(query)],
         mark_as_read=mark_as_read,
         limit=limit,
     )
 
-
-@patch_to(PyNewsReader)
-def _search_to_entry(self, search_result):
-    """For a given `reader` search result return the corresponding `reader.Entry`"""
-    for i in self._reader.get_entries():
-        if i.id == search_result.id and i.feed_url == search_result.feed_url:
-            return i
 
 # %% ../00_core.ipynb 12
 @patch_to(PyNewsReader)
