@@ -142,7 +142,7 @@ def getnews():
                 "source_url": i.feed_url,
                 "source_name": i.feed.title,
                 "icon": "mdi-bell" if i.important else "",
-                "tags": "Tags: " + ', '.join(pnr._get_tags(i))
+                "tags": [{"key": j, "value": j} for j in pnr._get_tags(i)]
             })
         if len(news) >= LIMIT:
             return jsonify(news)

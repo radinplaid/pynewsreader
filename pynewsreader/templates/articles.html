@@ -21,7 +21,10 @@
                     <br>
                         [[ i.published ]]
                     <br>
-                        [[ i.tags ]]
+                        <!-- [[ i.tags ]] -->
+                        <v-chip outlined color="deep-purple accent-4" class="ma-1" v-for="j in i.tags" v-bind:key="j.key">
+                            [[ j.value ]]
+                        </v-chip>
                     <br>
                         [[ i.topic ]]
                     </div>
