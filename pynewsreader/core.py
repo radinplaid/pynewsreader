@@ -256,9 +256,9 @@ def add_feed(self, feed: Union[Feed, str]):
     """
     if isinstance(feed, Feed):
         self._feed_names[feed.url] = feed.name
-        self._reader.add_feed(feed.url, exist_ok=True)
+        self._reader.add_feed(feed.url.rstrip("/"), exist_ok=True)
     elif isinstance(feed, str):
-        self._reader.add_feed(feed, exist_ok=True)
+        self._reader.add_feed(feed.rstrip("/"), exist_ok=True)
     else:
         raise Exception("Must be str or Feed type to add")
 

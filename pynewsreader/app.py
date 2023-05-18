@@ -117,13 +117,14 @@ def getnews():
         selected_feeds = pnr.feeds()
 
     for i in dat:
-        if i.published is not None:
-            article_date = i.published
-        else:
-            article_date = i.added
+        if pnr._feed_names[i.feed.url] in selected_feeds or i.feed.title in selected_feeds:
+            if i.published is not None:
+                article_date = i.published
+            else:
+                article_date = i.added
 
-        if 'min_date' in args:
-            if pnr._feed_names[i.feed.url] in selected_feeds or i.feed.title in selected_feeds:
+
+            if 'min_date' in args:
                 if (
                     article_date < date_parse(args['min_date']).replace(tzinfo=pytz.UTC) or
                     article_date > date_parse(args['max_date']).replace(
@@ -131,21 +132,21 @@ def getnews():
                 ):
                     continue
 
-        pnr._reader.mark_entry_as_read(i)
-        if i.link not in all_links:
-            all_links.append(i.link)
-            news.append({
-                "title": i.title,
-                "link": i.link,
-                "published": str(article_date),
-                "published_epoch": article_date.timestamp(),
-                "source_url": i.feed_url,
-                "source_name": i.feed.title,
-                "icon": "mdi-bell" if i.important else "",
-                "tags": [{"key": j, "value": j} for j in pnr._get_tags(i)]
-            })
-        if len(news) >= LIMIT:
-            return jsonify(news)
+            pnr._reader.mark_entry_as_read(i)
+            if i.link not in all_links:
+                all_links.append(i.link)
+                news.append({
+                    "title": i.title,
+                    "link": i.link,
+                    "published": str(article_date),
+                    "published_epoch": article_date.timestamp(),
+                    "source_url": i.feed_url,
+                    "source_name": i.feed.title,
+                    "icon": "mdi-bell" if i.important else "",
+                    "tags": [{"key": j, "value": j} for j in pnr._get_tags(i)]
+                })
+            if len(news) >= LIMIT:
+                return jsonify(news)
 
     return jsonify(news)
 
