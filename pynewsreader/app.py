@@ -117,7 +117,7 @@ def getnews():
         selected_feeds = pnr.feeds()
 
     for i in dat:
-        if pnr._feed_names[i.feed.url] in selected_feeds or i.feed.title in selected_feeds:
+        if (i.feed.url in pnr._feed_names and pnr._feed_names[i.feed.url] in selected_feeds) or i.feed.title in selected_feeds:
             if i.published is not None:
                 article_date = i.published
             else:
