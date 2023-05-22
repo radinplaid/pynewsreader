@@ -60,10 +60,13 @@ const vm = new Vue({ // vm is our Vue instance's name for consistency.
 			event.stopPropagation();
 		},
 		mark_important: function (event) {
+			console.log(this);
 			console.log("Marking article as important: " + this.link);
+			const entry_id = this.entry_id[0][0];
+			const source_url = this.source_url[0][0];
 			const link = this.link[0][0];
 			axios
-				.get("/mark_important?link=" + link)
+			.get("/mark_unimportant?source_url=" + source_url + "&entry_id=" + entry_id)
 				.then(function (response) {
 					if (response.status == 200) {
 						vm.snackbar = true;
@@ -81,8 +84,10 @@ const vm = new Vue({ // vm is our Vue instance's name for consistency.
 		mark_unimportant: function (event) {
 			console.log("Marking article as unimportant: " + this.link);
 			const link = this.link[0][0];
+			const entry_id = this.entry_id[0][0];
+			const source_url = this.source_url[0][0];
 			axios
-				.get("/mark_unimportant?link=" + link)
+				.get("/mark_unimportant?source_url=" + source_url + "&entry_id=" + entry_id)
 				.then(function (response) {
 					if (response.status == 200) {
 						vm.snackbar = true;

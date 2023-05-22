@@ -136,6 +136,7 @@ def getnews():
             if i.link not in all_links:
                 all_links.append(i.link)
                 news.append({
+                    "id": i.id,
                     "title": i.title,
                     "link": i.link,
                     "published": str(article_date),

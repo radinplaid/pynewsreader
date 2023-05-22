@@ -36,7 +36,7 @@
                 <v-card-actions class="mt-auto">
                     <v-row>
                         <v-col>
-                            <v-btn dark @click="link = [[ i.link ]]" @click.prevent="mark_unimportant" text
+                            <v-btn dark @click="link = [[ i.link ]]; entry_id = [[ i.entry_id ]]; source_url = [[ i.source_url ]]" @click.prevent="mark_unimportant" text
                                 elevation="2" color="red darken-4">
                                 <v-icon left>
                                     mdi-thumb-down
@@ -45,7 +45,7 @@
                             </v-btn>
                         </v-col>
                         <v-col class="text-right">
-                            <v-btn dark @click="link = [[ i.link ]]" @click.default="mark_important" text elevation="2"
+                            <v-btn dark @click="link = [[ i.link ]]; entry_id = [[ i.entry_id ]]; source_url = [[ i.source_url ]]" @click.default="mark_important" text elevation="2"
                                 color="green darken-3">
                                 <v-icon left>
                                     mdi-thumb-up

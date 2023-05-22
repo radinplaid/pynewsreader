@@ -163,16 +163,6 @@ class PyNewsReader:
                     print(f"Marking entry as important: {i.title}")
                     self._reader.mark_entry_as_important(i)
 
-    def _mark_important(self, entry: reader.Entry = None):
-        """Mark entry as important"""
-        if entry is not None:
-            reader.Reader.mark_entry_as_important(entry)
-
-    def _mark_unimportant(self, entry: reader.Entry = None):
-        """Mark entry as important"""
-        if entry is not None:
-            reader.Reader.mark_entry_as_unimportant(entry)
-
     def _add_tag(self, entry: reader.Entry, tag_key: str, tag_value: Dict = None):
         """Add tag to entry"""
         reader.Reader.set_tag(entry, tag_key, tag_value)
@@ -180,6 +170,14 @@ class PyNewsReader:
     def _remove_tag(self, entry: reader.Entry, tag_key: str):
         """Remove tag from entry"""
         self._reader.delete_tag(entry, tag_key)
+
+    def _mark_important(self, feed_url: str, entry_id: str):
+        article = r._reader.get_entry((feed_url, entry_id))
+        self._reader.mark_entry_as_important(article)
+
+    def _mark_unimportant(self, feed_url: str, entry_id: str):
+        article = r._reader.get_entry((feed_url, entry_id))
+        self._reader.mark_entry_as_unimportant(article)
 
 # %% ../00_core.ipynb 6
 @patch_to(PyNewsReader)
@@ -199,11 +197,11 @@ def blacklist_remove(self, blacklist_string: str):
         with open(self._dbfolder / "title_blacklist.json", "wt") as myfile:
             json.dump(self._title_blacklist, myfile)
 
+
 @patch_to(PyNewsReader)
 def blacklist_show(self):
     """Show blacklist"""
     print(self._title_blacklist)
-  
 
 # %% ../00_core.ipynb 7
 @patch_to(PyNewsReader)
@@ -228,12 +226,12 @@ def whitelist_remove(self, whitelist_string: str):
         for entry in self._get_entries(limit=None):
             if whitelist_string in entry.title:
                 self._reader.mark_entry_as_unimportant(entry)
-                
+
+
 @patch_to(PyNewsReader)
 def whitelist_show(self):
     """Show whitelist"""
     print(self._title_whitelist)
-  
 
 # %% ../00_core.ipynb 8
 @patch_to(PyNewsReader)
@@ -328,22 +326,6 @@ def search(self, query: str, mark_as_read: bool = True, limit: int = 10):
         mark_as_read=mark_as_read,
         limit=limit,
     )
-
-
-# %% ../00_core.ipynb 12
-@patch_to(PyNewsReader)
-def _mark_entries_important_by_url(self, url: str):
-    matches = [i for i in self._reader.get_entries() if i.link==url]
-    for article in matches:
-        self._reader.mark_entry_as_important(article)
-
-
-@patch_to(PyNewsReader)
-def _mark_entries_unimportant_by_url(self, url: str):
-    matches = [i for i in self._reader.get_entries() if i.link==url]
-    for article in matches:
-        self._reader.mark_entry_as_unimportant(article)
-
 
 # %% ../00_core.ipynb 47
 def main():
