@@ -8,6 +8,7 @@ import json
 import logging
 from pathlib import Path
 from typing import *
+from collections import namedtuple
 
 import fire
 import reader
@@ -288,7 +289,8 @@ def feeds(self):
     Returns:
         List[str]: List of names of current pynewsreader feeds
     """
-    return [self._get_feed_title(i.url) for i in self._reader.get_feeds()]
+    feed_object = namedtuple('Feeds', ['url','name']) 
+    return [feed_object(i.url, self._get_feed_title(i.url)) for i in self._reader.get_feeds()]
 
 # %% ../00_core.ipynb 10
 @patch_to(PyNewsReader)

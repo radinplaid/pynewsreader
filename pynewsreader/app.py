@@ -73,7 +73,7 @@ def remove_tag():
 @app.route('/feeds', methods=['GET'])
 def feeds():
     pnr = PyNewsReader()
-    return jsonify(pnr.feeds())
+    return jsonify([i[1] for i in pnr.feeds()])
 
 
 @app.route('/getnews', methods=['GET'])
