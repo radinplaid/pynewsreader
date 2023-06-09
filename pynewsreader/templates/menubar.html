@@ -32,7 +32,7 @@
 
 
             <template>
-                <v-select v-on:input="filter" v-on:blur="filter" label="Feeds" v-model="category" :items="categories"
+                <v-select label="Feeds" v-model="category" :items="categories"
                     clearable multiple>
                     <template v-slot:selection="{ item, index }">
                         <v-chip v-if="index === 0">
