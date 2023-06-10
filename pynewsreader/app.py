@@ -114,7 +114,7 @@ def getnews():
     if 'categories' in args:
         selected_feeds = args['categories'].split(',')
     else:
-        selected_feeds = pnr.feeds()
+        selected_feeds = [i[1] for i in pnr.feeds()]
 
     for i in dat:
         if (i.feed.url in pnr._feed_names and pnr._feed_names[i.feed.url] in selected_feeds) or i.feed.title in selected_feeds:
