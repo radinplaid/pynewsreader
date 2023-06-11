@@ -1,0 +1,135 @@
+[
+  {
+    "objectID": "core.html",
+    "href": "core.html",
+    "title": "core",
+    "section": "",
+    "text": "source"
+  },
+  {
+    "objectID": "core.html#add-feeds",
+    "href": "core.html#add-feeds",
+    "title": "core",
+    "section": "Add Feeds",
+    "text": "Add Feeds\n\n# With names\nfor i in [\n    Feed(url=\"https://ricochet.media/en/feed\", name=\"Richochet Media\"),\n    Feed(url=\"https://thetyee.ca/rss2.xml\", name=\"The Tyee\"),\n    Feed(\n        url=\"https://www.thestar.com/content/thestar/feed.RSSManagerServlet.articles.topstories.rss\",\n        name=\"Toronto Star | Top Stories\",\n    ),\n    Feed(\n        url=\"https://www.thestar.com/content/thestar/feed.RSSManagerServlet.articles.news.investigations.rss\",\n        name=\"Toronto Star | Investigations\",\n    ),\n    Feed(\n        url=\"https://www.thestar.com/content/thestar/feed.RSSManagerServlet.articles.opinion.editorials.rss\",\n        name=\"Toronto Star | Editorials\",\n    ),\n    Feed(url=\"https://www.macleans.ca/feed/\", name=\"Macleans\"),\n]:\n    r.add_feed(i)\n\n# Use the default name from the feed\nfor i in [\n    \"https://rss.cbc.ca/lineup/topstories.xml\",\n    \"https://rss.cbc.ca/lineup/world.xml\",\n    \"https://rss.cbc.ca/lineup/canada.xml\",\n    \"https://rss.cbc.ca/lineup/business.xml\",\n    \"https://rss.cbc.ca/lineup/technology.xml\",\n    \"https://www.cbc.ca/cmlink/rss-canada-ottawa\",\n    \"https://thenarwhal.ca/feed/\",\n    \"https://www.theguardian.com/science/rss\",\n    \"https://www.theguardian.com/world/canada/rss\",\n]:\n    r.add_feed(Feed(i))"
+  },
+  {
+    "objectID": "core.html#update-feeds",
+    "href": "core.html#update-feeds",
+    "title": "core",
+    "section": "Update Feeds",
+    "text": "Update Feeds\n\nr.update()"
+  },
+  {
+    "objectID": "core.html#list-feeds",
+    "href": "core.html#list-feeds",
+    "title": "core",
+    "section": "List Feeds",
+    "text": "List Feeds\n\nr.feeds()"
+  },
+  {
+    "objectID": "core.html#display-entries",
+    "href": "core.html#display-entries",
+    "title": "core",
+    "section": "Display Entries",
+    "text": "Display Entries\nread = None shows all entries\nread = False shows only unread entries\nread = True shows only read entries\n\nr.show(limit=5, read=None, mark_as_read=False)"
+  },
+  {
+    "objectID": "core.html#search-entries",
+    "href": "core.html#search-entries",
+    "title": "core",
+    "section": "Search Entries",
+    "text": "Search Entries\n\nr.search(\"rate\", mark_as_read=False)"
+  },
+  {
+    "objectID": "core.html#tag-entry",
+    "href": "core.html#tag-entry",
+    "title": "core",
+    "section": "Tag Entry",
+    "text": "Tag Entry\n\ntest = list(r._reader.get_entries())\n\n\nr._reader.set_tag(test[0], \"foobar\")\n\n\nlist(r._reader.get_tags(test[0]))\n\n\n# We added a method to just return the tag key:\nr._get_tags(test[0])"
+  },
+  {
+    "objectID": "core.html#remove-tag-from-entry",
+    "href": "core.html#remove-tag-from-entry",
+    "title": "core",
+    "section": "Remove tag from entry",
+    "text": "Remove tag from entry\n\nr._reader.delete_tag(test[0], \"foobar\")\n\n\nlist(r._get_tags(test[0]))"
+  },
+  {
+    "objectID": "core.html#mark-as-importantunimportant",
+    "href": "core.html#mark-as-importantunimportant",
+    "title": "core",
+    "section": "Mark as Important/Unimportant",
+    "text": "Mark as Important/Unimportant\n\nr._mark_important(test[0].feed_url, test[0].id)\n\n\nr._mark_unimportant(test[0].feed_url, test[0].id)"
+  },
+  {
+    "objectID": "core.html#mark-as-read-unread",
+    "href": "core.html#mark-as-read-unread",
+    "title": "core",
+    "section": "Mark as Read / Unread",
+    "text": "Mark as Read / Unread\n\nr._reader.mark_entry_as_read(test[0])\nr._reader.mark_entry_as_unread(test[0])"
+  },
+  {
+    "objectID": "core.html#automatically-mark-entries-as-read",
+    "href": "core.html#automatically-mark-entries-as-read",
+    "title": "core",
+    "section": "Automatically mark entries as read",
+    "text": "Automatically mark entries as read\nWhen updating feeds, entries with titles matching these strings will automatically be marked as read\n\nfor i in [\n    \"Musk\",\n    \"Apple\",\n    \"Bezos\",\n    \"Google\",\n    \"Samsung\",\n    \"iPhone\",\n    \"iPad\",\n    \"guardian.com/sport/\",\n    \"guardian.com/football/\",\n    \"thestar.com/sports\",\n]:\n    r.blacklist_add(i)\n\n\nr.blacklist_show()\n\n\n# r.update()"
+  },
+  {
+    "objectID": "core.html#automatically-mark-entries-as-important",
+    "href": "core.html#automatically-mark-entries-as-important",
+    "title": "core",
+    "section": "Automatically mark entries as important",
+    "text": "Automatically mark entries as important\n\nfor i in [\"interest rate\", \"Bank of Canada\", \"housing market\"]:\n    r.whitelist_add(i)\n\n\nr.whitelist_show()\n\n\n# r.update()"
+  },
+  {
+    "objectID": "core.html#low-level-access-to-data",
+    "href": "core.html#low-level-access-to-data",
+    "title": "core",
+    "section": "Low level access to data",
+    "text": "Low level access to data\n\nentries = r._get_entries(limit=1)\nentry = [i for i in entries][0]\nentry"
+  },
+  {
+    "objectID": "core.html#cli",
+    "href": "core.html#cli",
+    "title": "core",
+    "section": "CLI",
+    "text": "CLI\n\nsource\n\nmain\n\n main ()"
+  },
+  {
+    "objectID": "index.html",
+    "href": "index.html",
+    "title": "pynewsreader",
+    "section": "",
+    "text": "pip install git+https://github.com/radinplaid/pynewsreader.git"
+  },
+  {
+    "objectID": "index.html#install",
+    "href": "index.html#install",
+    "title": "pynewsreader",
+    "section": "",
+    "text": "pip install git+https://github.com/radinplaid/pynewsreader.git"
+  },
+  {
+    "objectID": "index.html#command-line-usage",
+    "href": "index.html#command-line-usage",
+    "title": "pynewsreader",
+    "section": "Command Line Usage",
+    "text": "Command Line Usage\n# Show help\npnr --help\n\n# Add a feed\npnr add_feed https://rss.cbc.ca/lineup/world.xml\n\n# Update feed(s)\npnr update\n\n# Show entries\npnr show --limit 10\n\n# Search entries\npnr search canada"
+  },
+  {
+    "objectID": "index.html#web-application",
+    "href": "index.html#web-application",
+    "title": "pynewsreader",
+    "section": "Web Application",
+    "text": "Web Application\nThe main interface for viewing the RSS feeds is the Flask web application, which can be lauched from the command line:\npnr-app --host 0.0.0.0 --port 5000\n# Or\npython3 -m pynewsreader.app --host 0.0.0.0 --port 5000"
+  },
+  {
+    "objectID": "index.html#python-usage",
+    "href": "index.html#python-usage",
+    "title": "pynewsreader",
+    "section": "Python Usage",
+    "text": "Python Usage\nImport and initialize pnr object\n\nfrom pynewsreader.core import Feed, PyNewsReader\n\npnr = PyNewsReader()\n\nAdd a feed, and use a custom name for it\n\nmyfeed = Feed(\n    url=\"https://www.thestar.com/content/thestar/feed.RSSManagerServlet.articles.topstories.rss\",\n    name=\"Toronto Star | Top Stories\",\n)\n\npnr.add_feed(myfeed)\n\n\nmyfeed = Feed(\n    url=\"https://www.thebeaverton.com/feed/?q=1684448990\",\n    name=\"The Beaverton\",\n)\n\npnr.add_feed(myfeed)\n\n\nmyfeed = Feed(\n    url=\"https://hf.co/blog/feed.xml\",\n    name=\"Huggingface Blog\",\n)\n\npnr.add_feed(myfeed)\n\n\nmyfeed = Feed(\n    url=\"https://engineering.fb.com/feed\",\n    name=\"Facebook AI Blog\",\n)\n\npnr.add_feed(myfeed)\n\n\nmyfeed = Feed(\n    url=\"https://ai.googleblog.com/atom.xml\",\n    name=\"Google AI Blog\",\n)\n\npnr.add_feed(myfeed)\n\n\npnr.add_feed(\"https://proceedings.mlr.press/feed.xml\")\n\n\npnr.add_feed(\"https://bair.berkeley.edu/blog/feed.xml\")\n\n\npnr.add_feed(\"https://openai.com/blog/rss.xml\")\n\n\npnr.add_feed(\"https://blogs.rstudio.com/ai/index.xml\")\n\n\npnr.add_feed(\"https://www.jstatsoft.org/gateway/plugin/WebFeedGatewayPlugin/rss2\")\n\nUpdate feeds\n\npnr.update()\n\nList entries\n\npnr.show(limit=1)\n\nSearch entries\n\npnr.search(\"inflation\", limit=1)"
+  }
+]
