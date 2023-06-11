@@ -82,7 +82,7 @@ def getnews():
     news = []
     all_links = []
     only_unread = False
-    only_important = False
+    only_important = None
 
     args = request.args.to_dict()
 
@@ -91,14 +91,15 @@ def getnews():
     else:
         LIMIT = 50
 
+    if 'important' in args:
+        if args['important'] == 'false':
+            only_important = None
+        else:
+            only_important = True
+
     if 'search' in args:
         if args['unread'] == 'false':
             only_unread = None
-        if 'important' in args:
-            if args['important'] == 'false':
-                only_important = None
-            else:
-                only_important = True
 
     if 'search' in args and args['search'] != 'null' and len(args['search']) > 0:
         if args['search'] != "null" and args['search'] != "":
@@ -144,11 +145,15 @@ def getnews():
                     "source_url": i.feed_url,
                     "source_name": i.feed.title,
                     "icon": "mdi-bell" if i.important else "",
+                    "important": i.important,
                     "tags": [{"key": j, "value": j} for j in pnr._get_tags(i)]
                 })
             if len(news) >= LIMIT:
                 return jsonify(news)
 
+    # Return important news first
+    news = sorted(news, key = lambda x: x['important'], reverse=True)
+    
     return jsonify(news)
 
 
