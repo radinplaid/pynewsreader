@@ -1,0 +1,192 @@
+[
+  {
+    "objectID": "index.html",
+    "href": "index.html",
+    "title": "pynewsreader",
+    "section": "",
+    "text": "pip install git+https://github.com/radinplaid/pynewsreader.git",
+    "crumbs": [
+      "pynewsreader"
+    ]
+  },
+  {
+    "objectID": "index.html#install",
+    "href": "index.html#install",
+    "title": "pynewsreader",
+    "section": "",
+    "text": "pip install git+https://github.com/radinplaid/pynewsreader.git",
+    "crumbs": [
+      "pynewsreader"
+    ]
+  },
+  {
+    "objectID": "index.html#command-line-usage",
+    "href": "index.html#command-line-usage",
+    "title": "pynewsreader",
+    "section": "Command Line Usage",
+    "text": "Command Line Usage\n# Show help\npnr --help\n\n# Add a feed\npnr add_feed https://rss.cbc.ca/lineup/world.xml\n\n# Update feed(s)\npnr update\n\n# Show entries\npnr show --limit 10\n\n# Search entries\npnr search canada",
+    "crumbs": [
+      "pynewsreader"
+    ]
+  },
+  {
+    "objectID": "index.html#web-application",
+    "href": "index.html#web-application",
+    "title": "pynewsreader",
+    "section": "Web Application",
+    "text": "Web Application\nThe main interface for viewing the RSS feeds is the Flask web application, which can be lauched from the command line:\npnr-app --host 0.0.0.0 --port 5000\n# Or\npython3 -m pynewsreader.app --host 0.0.0.0 --port 5000",
+    "crumbs": [
+      "pynewsreader"
+    ]
+  },
+  {
+    "objectID": "index.html#python-usage",
+    "href": "index.html#python-usage",
+    "title": "pynewsreader",
+    "section": "Python Usage",
+    "text": "Python Usage\nImport and initialize pnr object\n\nfrom pynewsreader.core import Feed, PyNewsReader\n\npnr = PyNewsReader()\n\n\npnr.feeds()\n\n[Feeds(url='https://openai.com/blog/rss.xml', name='OpenAI Blog'),\n Feeds(url='https://ricochet.media/en/feed', name='Richochet Media'),\n Feeds(url='https://www.macleans.ca/feed', name='https://www.macleans.ca/feed'),\n Feeds(url='https://blog.google/technology/ai/rss', name='AI'),\n Feeds(url='https://www.answer.ai/index.xml', name='Answer.ai Blog'),\n Feeds(url='https://www.theguardian.com/world/canada/rss', name='Canada | The Guardian'),\n Feeds(url='https://www.cbc.ca/webfeed/rss/rss-business', name='CBC | Business'),\n Feeds(url='https://www.cbc.ca/webfeed/rss/rss-canada', name='CBC | Canada'),\n Feeds(url='https://www.cbc.ca/webfeed/rss/rss-canada-ottawa', name='CBC | Ottawa'),\n Feeds(url='https://www.cbc.ca/webfeed/rss/rss-technology', name='CBC | Technology'),\n Feeds(url='https://www.cbc.ca/webfeed/rss/rss-topstories', name='CBC | Top Stories'),\n Feeds(url='https://www.cbc.ca/webfeed/rss/rss-world', name='CBC | World'),\n Feeds(url='https://engineering.fb.com/feed', name='Facebook AI Blog'),\n Feeds(url='https://hf.co/blog/feed.xml', name='Huggingface Blog'),\n Feeds(url='https://ricochet.media/feed', name='Ricochet'),\n Feeds(url='https://www.theguardian.com/science/rss', name='Science | The Guardian'),\n Feeds(url='https://simonwillison.net/atom/everything', name=\"Simon Willison's Weblog\"),\n Feeds(url='https://www.theguardian.com/uk/technology/rss', name='Technology | The Guardian'),\n Feeds(url='https://www.thebeaverton.com/feed/?q=1684448990', name='The Beaverton'),\n Feeds(url='https://thenarwhal.ca/feed', name='The Narwhal'),\n Feeds(url='https://thetyee.ca/rss2.xml', name='The Tyee'),\n Feeds(url='https://www.theguardian.com/world/rss', name='World news | The Guardian'),\n Feeds(url='https://www.thestar.com/search/?f=rss&t=article&c=news/investigations*&l=50&s=start_time&sd=desc', name='Toronto Star | Investigations'),\n Feeds(url='https://www.thestar.com/search/?f=rss&t=article&bl=2827101&l=50', name='Toronto Star | Top Stories')]\n\n\nAdd a feed, and use a custom name for it\n\nsome_feeds = {\n    \"https://www.cbc.ca/webfeed/rss/rss-canada\": \"CBC | Canada\",\n    \"https://www.cbc.ca/webfeed/rss/rss-business\": \"CBC | Business\",\n}\n\n\nall_feeds = {\n    \"https://ricochet.media/feed/\": \"Richochet Media\",\n    \"https://thetyee.ca/rss2.xml\": \"The Tyee\",\n    \"https://www.thestar.com/search/?f=rss&t=article&bl=2827101&l=50\": \"Toronto Star | Top Stories\",\n    \"https://www.thestar.com/search/?f=rss&t=article&c=news/investigations*&l=50&s=start_time&sd=desc\": \"Toronto Star | Investigations\",\n    \"https://www.macleans.ca/feed/\": \"Macleans\",\n    \"https://www.cbc.ca/webfeed/rss/rss-topstories\": \"CBC | Top Stories\",\n    \"https://www.cbc.ca/webfeed/rss/rss-canada-ottawa\": \"CBC | Ottawa\",\n    \"https://www.cbc.ca/webfeed/rss/rss-world\": \"CBC | World\",\n    \"https://www.cbc.ca/webfeed/rss/rss-canada\": \"CBC | Canada\",\n    \"https://www.cbc.ca/webfeed/rss/rss-business\": \"CBC | Business\",\n    \"https://www.cbc.ca/webfeed/rss/rss-technology\": \"CBC | Technology\",\n    \"https://thenarwhal.ca/feed/\": None,\n    \"https://www.theguardian.com/world/rss\": None,\n    \"https://www.theguardian.com/uk/technology/rss\": None,\n    \"https://www.theguardian.com/science/rss\": None,\n    \"https://www.theguardian.com/world/canada/rss\": None,\n    \"https://www.thebeaverton.com/feed/?q=1684448990\":\"The Beaverton\",\n    \"https://hf.co/blog/feed.xml\": \"Huggingface Blog\",\n    \"https://engineering.fb.com/feed\": \"Facebook AI Blog\",\n    \"https://blog.google/technology/ai/rss/\": \"Google AI Blog\",\n    \"https://openai.com/blog/rss.xml\": \"OpenAI Blog\",\n    \"https://www.answer.ai/index.xml\": \"Answer.ai Blog\",\n    \"https://simonwillison.net/atom/everything/\":\"Simon Wilson Weblog\"\n}\n\n\npnr.feeds()\n\n[Feeds(url='https://openai.com/blog/rss.xml', name='OpenAI Blog'),\n Feeds(url='https://ricochet.media/en/feed', name='Richochet Media'),\n Feeds(url='https://www.macleans.ca/feed', name='https://www.macleans.ca/feed'),\n Feeds(url='https://blog.google/technology/ai/rss', name='AI'),\n Feeds(url='https://www.answer.ai/index.xml', name='Answer.ai Blog'),\n Feeds(url='https://www.theguardian.com/world/canada/rss', name='Canada | The Guardian'),\n Feeds(url='https://www.cbc.ca/webfeed/rss/rss-business', name='CBC | Business'),\n Feeds(url='https://www.cbc.ca/webfeed/rss/rss-canada', name='CBC | Canada'),\n Feeds(url='https://www.cbc.ca/webfeed/rss/rss-canada-ottawa', name='CBC | Ottawa'),\n Feeds(url='https://www.cbc.ca/webfeed/rss/rss-technology', name='CBC | Technology'),\n Feeds(url='https://www.cbc.ca/webfeed/rss/rss-topstories', name='CBC | Top Stories'),\n Feeds(url='https://www.cbc.ca/webfeed/rss/rss-world', name='CBC | World'),\n Feeds(url='https://engineering.fb.com/feed', name='Facebook AI Blog'),\n Feeds(url='https://hf.co/blog/feed.xml', name='Huggingface Blog'),\n Feeds(url='https://ricochet.media/feed', name='Ricochet'),\n Feeds(url='https://www.theguardian.com/science/rss', name='Science | The Guardian'),\n Feeds(url='https://simonwillison.net/atom/everything', name=\"Simon Willison's Weblog\"),\n Feeds(url='https://www.theguardian.com/uk/technology/rss', name='Technology | The Guardian'),\n Feeds(url='https://www.thebeaverton.com/feed/?q=1684448990', name='The Beaverton'),\n Feeds(url='https://thenarwhal.ca/feed', name='The Narwhal'),\n Feeds(url='https://thetyee.ca/rss2.xml', name='The Tyee'),\n Feeds(url='https://www.theguardian.com/world/rss', name='World news | The Guardian'),\n Feeds(url='https://www.thestar.com/search/?f=rss&t=article&c=news/investigations*&l=50&s=start_time&sd=desc', name='Toronto Star | Investigations'),\n Feeds(url='https://www.thestar.com/search/?f=rss&t=article&bl=2827101&l=50', name='Toronto Star | Top Stories')]\n\n\n\nfor feed, name in some_feeds.items():\n    pnr.add_feed(Feed(url=feed, name=name if name else None))\n\n\npnr.feeds()\n\n[Feeds(url='https://openai.com/blog/rss.xml', name='OpenAI Blog'),\n Feeds(url='https://ricochet.media/en/feed', name='Richochet Media'),\n Feeds(url='https://www.macleans.ca/feed', name='https://www.macleans.ca/feed'),\n Feeds(url='https://blog.google/technology/ai/rss', name='AI'),\n Feeds(url='https://www.answer.ai/index.xml', name='Answer.ai Blog'),\n Feeds(url='https://www.theguardian.com/world/canada/rss', name='Canada | The Guardian'),\n Feeds(url='https://www.cbc.ca/webfeed/rss/rss-business', name='CBC | Business'),\n Feeds(url='https://www.cbc.ca/webfeed/rss/rss-canada', name='CBC | Canada'),\n Feeds(url='https://www.cbc.ca/webfeed/rss/rss-canada-ottawa', name='CBC | Ottawa'),\n Feeds(url='https://www.cbc.ca/webfeed/rss/rss-technology', name='CBC | Technology'),\n Feeds(url='https://www.cbc.ca/webfeed/rss/rss-topstories', name='CBC | Top Stories'),\n Feeds(url='https://www.cbc.ca/webfeed/rss/rss-world', name='CBC | World'),\n Feeds(url='https://engineering.fb.com/feed', name='Facebook AI Blog'),\n Feeds(url='https://hf.co/blog/feed.xml', name='Huggingface Blog'),\n Feeds(url='https://ricochet.media/feed', name='Ricochet'),\n Feeds(url='https://www.theguardian.com/science/rss', name='Science | The Guardian'),\n Feeds(url='https://simonwillison.net/atom/everything', name=\"Simon Willison's Weblog\"),\n Feeds(url='https://www.theguardian.com/uk/technology/rss', name='Technology | The Guardian'),\n Feeds(url='https://www.thebeaverton.com/feed/?q=1684448990', name='The Beaverton'),\n Feeds(url='https://thenarwhal.ca/feed', name='The Narwhal'),\n Feeds(url='https://thetyee.ca/rss2.xml', name='The Tyee'),\n Feeds(url='https://www.theguardian.com/world/rss', name='World news | The Guardian'),\n Feeds(url='https://www.thestar.com/search/?f=rss&t=article&c=news/investigations*&l=50&s=start_time&sd=desc', name='Toronto Star | Investigations'),\n Feeds(url='https://www.thestar.com/search/?f=rss&t=article&bl=2827101&l=50', name='Toronto Star | Top Stories')]\n\n\nUpdate feeds\n\npnr.update()\n\nMarking entry as important: Harold the Mortgage Closer accused of charging ‘vulnerable’ people interest rates up to\n76 per cent\n\n\n\nList entries\n\npnr.show(limit=1)\n\n╭────────────────────────────────────────── Toronto Star | Top Stories ───────────────────────────────────────────╮\n│ Title: Taylor Swift inspires Justin Trudeau to show off his dances moves at Toronto concert                     │\n│ Date: 2024-11-23                                                                                                │\n│                                                                                                                 │\n│ The Prime Minister's Office confirmed that Trudeau and his family attended the fifth of Swift's six concerts    │\n│ Friday night at the Rogers Centre.                                                                              │\n│                                                                                                                 │\n╰─ https://www.thestar.com/entertainment/music/taylor-swift-inspires-justin-trudeau-to-show-off-his-dances-moves-─╯\n\n\n\n\n\n\nSearch entries\n\npnr.search(\"inflation\", limit=1)\n\n╭──────────────────────────────────────────────── CBC | Business ─────────────────────────────────────────────────╮\n│ Title: Inflation ticked up to 2% in October after previous month's steep drop in gas prices                     │\n│ Date: 2024-11-19                                                                                                │\n│                                                                                                                 │\n│ Canada's inflation rate ticked up to two per cent in October, Statistics Canada said on Tuesday. The consumer   │\n│ price index had previously hit 1.6 per cent in September, thanks to a steep decline in gas prices.              │\n│                                                                                                                 │\n╰─────────────────── https://www.cbc.ca/news/business/inflation-october-2024-1.7387125?cmp=rss ───────────────────╯\n\n\n\n\n\n\nBlacklist\n\nfor i in [\n    \"Musk\",\n    \"Apple\",\n    \"Bezos\",\n    \"Google\",\n    \"Samsung\",\n    \"iPhone\",\n    \"iPad\",\n    \"guardian.com/sport/\",\n    \"guardian.com/football/\",\n    \"thestar.com/sports\",\n    \"cbc.ca/sports\"\n]:\n    pnr.blacklist_add(i)\n\nWhitelist\n\n# Automatically marks as \"Important\"\nfor i in [\"interest rate\", \"Bank of Canada\", \"housing market\"]:\n    pnr.whitelist_add(i)",
+    "crumbs": [
+      "pynewsreader"
+    ]
+  },
+  {
+    "objectID": "core.html",
+    "href": "core.html",
+    "title": "core",
+    "section": "",
+    "text": "source",
+    "crumbs": [
+      "core"
+    ]
+  },
+  {
+    "objectID": "core.html#add-feeds",
+    "href": "core.html#add-feeds",
+    "title": "core",
+    "section": "Add Feeds",
+    "text": "Add Feeds\n\n# With names\nfor i in [\n    Feed(url=\"https://ricochet.media/en/feed\", name=\"Richochet Media\"),\n    Feed(url=\"https://thetyee.ca/rss2.xml\", name=\"The Tyee\"),\n]:\n    r.add_feed(i)\n\n# Use the default name from the feed\nfor i in [\n    \"https://www.theguardian.com/science/rss\",\n    \"https://www.theguardian.com/world/canada/rss\",\n]:\n    r.add_feed(Feed(i))",
+    "crumbs": [
+      "core"
+    ]
+  },
+  {
+    "objectID": "core.html#update-feeds",
+    "href": "core.html#update-feeds",
+    "title": "core",
+    "section": "Update Feeds",
+    "text": "Update Feeds\n\nr.update()",
+    "crumbs": [
+      "core"
+    ]
+  },
+  {
+    "objectID": "core.html#list-feeds",
+    "href": "core.html#list-feeds",
+    "title": "core",
+    "section": "List Feeds",
+    "text": "List Feeds\n\nr.feeds()",
+    "crumbs": [
+      "core"
+    ]
+  },
+  {
+    "objectID": "core.html#display-entries",
+    "href": "core.html#display-entries",
+    "title": "core",
+    "section": "Display Entries",
+    "text": "Display Entries\nread = None shows all entries\nread = False shows only unread entries\nread = True shows only read entries\n\nr.show(limit=5, read=None, mark_as_read=False)",
+    "crumbs": [
+      "core"
+    ]
+  },
+  {
+    "objectID": "core.html#search-entries",
+    "href": "core.html#search-entries",
+    "title": "core",
+    "section": "Search Entries",
+    "text": "Search Entries\n\nr.search(\"rate\", mark_as_read=False)",
+    "crumbs": [
+      "core"
+    ]
+  },
+  {
+    "objectID": "core.html#tag-entry",
+    "href": "core.html#tag-entry",
+    "title": "core",
+    "section": "Tag Entry",
+    "text": "Tag Entry\n\ntest = list(r._reader.get_entries())\n\n\nr._reader.set_tag(test[0], \"foobar\")\n\n\nlist(r._reader.get_tags(test[0]))\n\n\n# We added a method to just return the tag key:\nr._get_tags(test[0])",
+    "crumbs": [
+      "core"
+    ]
+  },
+  {
+    "objectID": "core.html#remove-tag-from-entry",
+    "href": "core.html#remove-tag-from-entry",
+    "title": "core",
+    "section": "Remove tag from entry",
+    "text": "Remove tag from entry\n\nr._reader.delete_tag(test[0], \"foobar\")\n\n\nlist(r._get_tags(test[0]))",
+    "crumbs": [
+      "core"
+    ]
+  },
+  {
+    "objectID": "core.html#mark-as-importantunimportant",
+    "href": "core.html#mark-as-importantunimportant",
+    "title": "core",
+    "section": "Mark as Important/Unimportant",
+    "text": "Mark as Important/Unimportant\n\nr._mark_important(test[0].feed_url, test[0].id)\n\n\nr._mark_unimportant(test[0].feed_url, test[0].id)",
+    "crumbs": [
+      "core"
+    ]
+  },
+  {
+    "objectID": "core.html#mark-as-read-unread",
+    "href": "core.html#mark-as-read-unread",
+    "title": "core",
+    "section": "Mark as Read / Unread",
+    "text": "Mark as Read / Unread\n\nr._reader.mark_entry_as_read(test[0])\nr._reader.mark_entry_as_unread(test[0])",
+    "crumbs": [
+      "core"
+    ]
+  },
+  {
+    "objectID": "core.html#automatically-mark-entries-as-read",
+    "href": "core.html#automatically-mark-entries-as-read",
+    "title": "core",
+    "section": "Automatically mark entries as read",
+    "text": "Automatically mark entries as read\nWhen updating feeds, entries with titles matching these strings will automatically be marked as read\n\nfor i in [\n    \"Musk\",\n    \"Apple\",\n    \"Bezos\",\n    \"Google\",\n    \"Samsung\",\n    \"iPhone\",\n    \"iPad\",\n    \"guardian.com/sport/\",\n    \"guardian.com/football/\",\n    \"thestar.com/sports\",\n]:\n    r.blacklist_add(i)\n\n\nr.blacklist_show()\n\n\n# r.update()",
+    "crumbs": [
+      "core"
+    ]
+  },
+  {
+    "objectID": "core.html#automatically-mark-entries-as-important",
+    "href": "core.html#automatically-mark-entries-as-important",
+    "title": "core",
+    "section": "Automatically mark entries as important",
+    "text": "Automatically mark entries as important\n\nfor i in [\"interest rate\", \"Bank of Canada\", \"housing market\"]:\n    r.whitelist_add(i)\n\n\nr.whitelist_show()\n\n\n# r.update()",
+    "crumbs": [
+      "core"
+    ]
+  },
+  {
+    "objectID": "core.html#low-level-access-to-data",
+    "href": "core.html#low-level-access-to-data",
+    "title": "core",
+    "section": "Low level access to data",
+    "text": "Low level access to data\n\nentries = r._get_entries(limit=1)\nentry = [i for i in entries][0]\nentry",
+    "crumbs": [
+      "core"
+    ]
+  },
+  {
+    "objectID": "core.html#cli",
+    "href": "core.html#cli",
+    "title": "core",
+    "section": "CLI",
+    "text": "CLI\n\nsource\n\nmain\n\n main ()",
+    "crumbs": [
+      "core"
+    ]
+  }
+]
