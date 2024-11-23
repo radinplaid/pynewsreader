@@ -6,9 +6,9 @@ __all__ = ['console', 'logger', 'strip_html', 'Feed', 'PyNewsReader', 'main']
 # %% ../00_core.ipynb 3
 import json
 import logging
+from collections import namedtuple
 from pathlib import Path
 from typing import *
-from collections import namedtuple
 
 import fire
 import reader
@@ -89,6 +89,14 @@ class PyNewsReader:
 
         self._reader.enable_search()
 
+        def hook(session, request, **kwargs):
+            request.headers.setdefault(
+                "User-Agent",
+                "Mozilla/5.0 (X11; Linux x86_64; rv:132.0) Gecko/20100101 Firefox/132.0",
+            )
+
+        self._reader._parser.session_factory.request_hooks.append(hook)
+
     def _print_entries(
         self, entries: List[reader.Entry], mark_as_read: bool = True, limit: int = 10
     ):
@@ -115,7 +123,10 @@ class PyNewsReader:
                     panel_body = ""
                 panel_body += f"Title: [bold]{e.title}[/bold]" + "\n"
                 panel_body += str(published_date) + "\n\n"
-                panel_body += strip_html(e.summary).strip() + "\n"
+                try:
+                    panel_body += strip_html(e.summary).strip() + "\n"
+                except TypeError:
+                    panel_body += str(e.summary) + "\n"
 
                 console.print(
                     Panel(
@@ -289,8 +300,11 @@ def feeds(self):
     Returns:
         List[str]: List of names of current pynewsreader feeds
     """
-    feed_object = namedtuple('Feeds', ['url','name']) 
-    return [feed_object(i.url, self._get_feed_title(i.url)) for i in self._reader.get_feeds()]
+    feed_object = namedtuple("Feeds", ["url", "name"])
+    return [
+        feed_object(i.url, self._get_feed_title(i.url))
+        for i in self._reader.get_feeds()
+    ]
 
 # %% ../00_core.ipynb 10
 @patch_to(PyNewsReader)
@@ -323,16 +337,18 @@ def search(self, query: str, mark_as_read: bool = True, limit: int = 10):
         query (str): Search query
         mark_as_read (bool, optional): Mark results as read? Defaults to True.
     """
-    self._print_entries(
-        [self._reader.get_entry(i) for i in self._reader.search_entries(query)],
-        mark_as_read=mark_as_read,
-        limit=limit,
-    )
+    entries = [self._reader.get_entry(i) for i in self._reader.search_entries(query)]
+    if len(entries) > 0:
+        self._print_entries(
+            entries,
+            mark_as_read=mark_as_read,
+            limit=limit,
+        )
 
 # %% ../00_core.ipynb 47
 def main():
     fire.Fire(PyNewsReader)
 
 # %% ../00_core.ipynb 48
-if __name__ == "__main__":
-    main()
+# if __name__ == "__main__":
+#     main()
