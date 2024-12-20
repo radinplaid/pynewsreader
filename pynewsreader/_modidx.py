@@ -50,4 +50,5 @@ d = { 'settings': { 'branch': 'master',
                                    'pynewsreader.core.PyNewsReader.whitelist_show': ( 'core.html#pynewsreader.whitelist_show',
                                                                                       'pynewsreader/core.py'),
                                    'pynewsreader.core.main': ('core.html#main', 'pynewsreader/core.py'),
-                                   'pynewsreader.core.strip_html': ('core.html#strip_html', 'pynewsreader/core.py')}}}
+                                   'pynewsreader.core.strip_html': ('core.html#strip_html', 'pynewsreader/core.py')},
+            'pynewsreader.wip-app': {}}}

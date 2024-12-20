@@ -54,7 +54,6 @@ pnr.feeds()
 ```
 
     [Feeds(url='https://openai.com/blog/rss.xml', name='OpenAI Blog'),
-     Feeds(url='https://ricochet.media/en/feed', name='Richochet Media'),
      Feeds(url='https://www.macleans.ca/feed', name='https://www.macleans.ca/feed'),
      Feeds(url='https://blog.google/technology/ai/rss', name='AI'),
      Feeds(url='https://www.answer.ai/index.xml', name='Answer.ai Blog'),
@@ -120,7 +119,6 @@ pnr.feeds()
 ```
 
     [Feeds(url='https://openai.com/blog/rss.xml', name='OpenAI Blog'),
-     Feeds(url='https://ricochet.media/en/feed', name='Richochet Media'),
      Feeds(url='https://www.macleans.ca/feed', name='https://www.macleans.ca/feed'),
      Feeds(url='https://blog.google/technology/ai/rss', name='AI'),
      Feeds(url='https://www.answer.ai/index.xml', name='Answer.ai Blog'),
@@ -154,7 +152,6 @@ pnr.feeds()
 ```
 
     [Feeds(url='https://openai.com/blog/rss.xml', name='OpenAI Blog'),
-     Feeds(url='https://ricochet.media/en/feed', name='Richochet Media'),
      Feeds(url='https://www.macleans.ca/feed', name='https://www.macleans.ca/feed'),
      Feeds(url='https://blog.google/technology/ai/rss', name='AI'),
      Feeds(url='https://www.answer.ai/index.xml', name='Answer.ai Blog'),
@@ -194,14 +191,19 @@ List entries
 pnr.show(limit=1)
 ```
 
-<pre style="white-space:pre;overflow-x:auto;line-height:normal;font-family:Menlo,'DejaVu Sans Mono',consolas,'Courier New',monospace">╭────────────────────────────────────────── <span style="font-weight: bold">Toronto Star | Top Stories</span> ───────────────────────────────────────────╮
-│ Title: <span style="font-weight: bold">Taylor Swift inspires Justin Trudeau to show off his dances moves at Toronto concert</span>                     │
-│ Date: 2024-11-23                                                                                                │
+<pre style="white-space:pre;overflow-x:auto;line-height:normal;font-family:Menlo,'DejaVu Sans Mono',consolas,'Courier New',monospace">╭─────────────────────────────────────────── <span style="font-weight: bold">World news | The Guardian</span> ───────────────────────────────────────────╮
+│ Title: <span style="font-weight: bold">Mike Johnson says spending vote ‘very likely’ to avoid government shutdown – US politics live</span>            │
+│ Date: 2024-12-20                                                                                                │
 │                                                                                                                 │
-│ The Prime Minister's Office confirmed that Trudeau and his family attended the fifth of Swift's six concerts    │
-│ Friday night at the Rogers Centre.                                                                              │
+│ House speaker says there is ‘unanimous’ agreement to ‘move forward’; Republicans reportedly eye stopgap deal    │
+│ and raising debt limit after Trump inauguration Trump demands again to suspend US debt ceiling after funding    │
+│ deal failsThe US government could shut down. Here’s what to knowBesides bringing the federal government to the  │
+│ brink of a shutdown, Donald Trump has also lately been pressuring European countries to agree to buy more       │
+│ US-produced oil and gas, the Guardian’s Jill Ambrose reports:The US president-elect, Donald Trump, has warned   │
+│ the EU that it will face trade tariffs on its exports to the US unless its member states buy more American oil  │
+│ and gas. Continue reading...                                                                                    │
 │                                                                                                                 │
-╰─ <a href="https://www.thestar.com/entertainment/music/taylor-swift-inspires-justin-trudeau-to-show-off-his-dances-moves-at-toronto-concert/article_acef038e-a937-11ef-b0a8-fbad90af8546.html" target="_blank">https://www.thestar.com/entertainment/music/taylor-swift-inspires-justin-trudeau-to-show-off-his-dances-moves-</a>─╯
+╰─── <a href="https://www.theguardian.com/us-news/live/2024/dec/20/trump-government-shutdown-us-politics-latest-updates" target="_blank">https://www.theguardian.com/us-news/live/2024/dec/20/trump-government-shutdown-us-politics-latest-updates</a> ───╯
 </pre>
 <pre style="white-space:pre;overflow-x:auto;line-height:normal;font-family:Menlo,'DejaVu Sans Mono',consolas,'Courier New',monospace">
 </pre>
@@ -213,13 +215,13 @@ pnr.search("inflation", limit=1)
 ```
 
 <pre style="white-space:pre;overflow-x:auto;line-height:normal;font-family:Menlo,'DejaVu Sans Mono',consolas,'Courier New',monospace">╭──────────────────────────────────────────────── <span style="font-weight: bold">CBC | Business</span> ─────────────────────────────────────────────────╮
-│ Title: <span style="font-weight: bold">Inflation ticked up to 2% in October after previous month's steep drop in gas prices</span>                     │
-│ Date: 2024-11-19                                                                                                │
+│ Title: <span style="font-weight: bold">Canada's inflation rate edges down to 1.9%</span>                                                               │
+│ Date: 2024-12-17                                                                                                │
 │                                                                                                                 │
-│ Canada's inflation rate ticked up to two per cent in October, Statistics Canada said on Tuesday. The consumer   │
-│ price index had previously hit 1.6 per cent in September, thanks to a steep decline in gas prices.              │
+│ Canada's annual inflation rate ticked down to 1.9 per cent in November, with the slowdown in price growth       │
+│ mostly driven by lower mortgage interest costs and cheaper travel tours, Statistics Canada said on Tuesday.     │
 │                                                                                                                 │
-╰─────────────────── <a href="https://www.cbc.ca/news/business/inflation-october-2024-1.7387125?cmp=rss" target="_blank">https://www.cbc.ca/news/business/inflation-october-2024-1.7387125?cmp=rss</a> ───────────────────╯
+╰──────────────── <a href="https://www.cbc.ca/news/business/inflation-rate-november-2024-1.7412342?cmp=rss" target="_blank">https://www.cbc.ca/news/business/inflation-rate-november-2024-1.7412342?cmp=rss</a> ────────────────╯
 </pre>
 <pre style="white-space:pre;overflow-x:auto;line-height:normal;font-family:Menlo,'DejaVu Sans Mono',consolas,'Courier New',monospace">
 </pre>
