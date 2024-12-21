@@ -186,11 +186,11 @@ class PyNewsReader:
         self._reader.delete_tag(entry, tag_key)
 
     def _mark_important(self, feed_url: str, entry_id: str):
-        article = r._reader.get_entry((feed_url, entry_id))
+        article = self._reader.get_entry((feed_url, entry_id))
         self._reader.mark_entry_as_important(article)
 
     def _mark_unimportant(self, feed_url: str, entry_id: str):
-        article = r._reader.get_entry((feed_url, entry_id))
+        article = self._reader.get_entry((feed_url, entry_id))
         self._reader.mark_entry_as_unimportant(article)
 
 # %% ../00_core.ipynb 6

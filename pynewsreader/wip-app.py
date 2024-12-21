@@ -1,3 +1,5 @@
+from urllib.parse import urlencode
+
 from fa6_icons import svgs
 from fasthtml.common import *
 
@@ -15,28 +17,46 @@ app, rt = fast_app(
 )
 
 
+def b64_enc(x):
+    return base64.b64encode(x.encode("ascii")).decode("ascii")
+
+
+def b64_dec(x):
+    return base64.b64decode((x.encode("ascii"))).decode("ascii")
+
+
 def article_card(entry):
-    return A(
-        Card(
-            # P("Author: " + entry.author if entry.author else ""),
-            P("Source: " + entry.feed.title),
-            header=Div(
-                Img(
-                    style="max-width:64px; max-height: 64px; min-width:64px; max-width: 64px; margin-right: 20px;",
-                    src=f"https://t1.gstatic.com/faviconV2?client=SOCIAL&type=FAVICON&fallback_opts=TYPE,SIZE,URL&size=128&url={entry.feed.url}",
-                ),
-                H5(entry.title),
-                style="display: flex;",
-                cls="row contrast",
-            ),
-            footer="Date: " + get_date(entry),
-            style="max-width:450px; min-width: 450px;",
-            cls="box contrast",
+
+    return Card(
+        # P("Author: " + entry.author if entry.author else ""),
+        P("Source: " + entry.feed.title),
+        Button(
+            "👍",
+            cls="secondary",
+            hx_post=f"/mark_important/{b64_enc(entry.feed.url)}/{b64_enc(entry.id)}",
+            hx_swap="beforeend",
         ),
-        href=entry.link,
-        target="_blank",
-        style="text-decoration: none;",
-        cls="contrast",
+        Nbsp(),
+        Button(
+            "👎",
+            cls="secondary",
+            hx_post=f"/mark_unimportant/{b64_enc(entry.feed.url)}/{b64_enc(entry.id)}",
+            hx_swap="beforeend",
+        ),
+        P("❗Important") if entry.important else (),
+        header=A(
+            Img(
+                style="max-width:64px; max-height: 64px; min-width:64px; max-width: 64px; margin-right: 20px;",
+                src=f"https://t1.gstatic.com/faviconV2?client=SOCIAL&type=FAVICON&fallback_opts=TYPE,SIZE,URL&size=128&url={entry.feed.url}",
+            ),
+            H3("❗" + entry.title) if entry.important else H4(entry.title),
+            style="display: flex; text-decoration: none; ",
+            cls="row",
+            href=entry.link,
+            target="_blank",
+        ),
+        footer="Date: " + get_date(entry),
+        style="min-width: 450px; max-width:450px;",
     )
 
 
@@ -49,7 +69,7 @@ def get_date(entry):
 
 
 def show_articles(mark_read: bool = True):
-    entries = pnr._get_entries(limit=200, read=None)
+    entries = pnr._get_entries(limit=12, read=None)
     entries = [i for i in entries]
 
     if mark_read:
@@ -73,7 +93,7 @@ def show_articles(mark_read: bool = True):
 def get():
     return Div(
         Nav(
-            Ul(Li(H3("pynewsreader"))),
+            Ul(Li(H1("pynewsreader"))),
             Ul(
                 Li(
                     A(
@@ -87,12 +107,29 @@ def get():
         show_articles(),
         Span(cls="mdi mdi-github-circle"),
         Button("Next", hx_get="/change", hx_target="#main", hx_swap="innerHTML"),
+        style="padding-left: 10px;padding-right: 10px",
     )
 
 
 @rt("/change")
 def get():
     return Div(show_articles())
+
+
+@rt("/mark_important")
+@app.post("/mark_important/{feed_url}/{id}")
+def get(id: str, feed_url: str):
+    id = b64_dec(id)
+    feed_url = b64_dec(feed_url)
+    return pnr._mark_important(feed_url=feed_url, entry_id=id)
+
+
+@rt("/mark_unimportant")
+@app.post("/mark_unimportant/{feed_url}/{id}")
+def get(id: str, feed_url: str):
+    id = b64_dec(id)
+    feed_url = b64_dec(feed_url)
+    return pnr._mark_unimportant(feed_url=feed_url, entry_id=id)
 
 
 serve()
