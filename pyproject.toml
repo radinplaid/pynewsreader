@@ -1,0 +1,28 @@
+[build-system]
+requires = ["setuptools >= 61.0"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "pynewsreader"
+version = "0.1.0"
+description = ""
+authors = [{name = "radinplaid", email = "franey.mark@gmail.com"}]
+readme = "README.md"
+requires-python = ">= 3.8"
+
+dependencies = [
+    "reader>=3.16",
+    "pandas>=2.2.3",
+    "fire>=0.7.0",
+    "beautifulsoup4>=4.12.3",
+    "pytz>=2024.2",
+    "python-fasthtml>=0.10.3",
+    "apswutils>=0.0.2",
+    "fa6_icons>=0.0.2",
+    "fastcore>=1.7.27",
+    "rich>=13.9.0"
+]
+
+[project.scripts]
+pnr = "pynewsreader.core:main"
+pnr-app = "pynewsreader.app:cli_app"

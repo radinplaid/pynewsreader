@@ -1,9 +1,0 @@
-project:
-  output-dir: _docs
-
-website:
-  title: "pynewsreader"
-  site-url: "https://radinplaid.github.io/pynewsreader"
-  description: "A news aggregator and reader written in python"
-  repo-branch: master
-  repo-url: "https://github.com/radinplaid/pynewsreader"
