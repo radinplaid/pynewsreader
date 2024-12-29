@@ -1,5 +1,3 @@
-import inspect
-
 from fa6_icons import svgs
 from fasthtml.common import *
 from fire import Fire
