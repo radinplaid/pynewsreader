@@ -106,7 +106,7 @@ def get():
         ),
         show_articles(),
         Span(cls="mdi mdi-github-circle"),
-        Button("Next", hx_get="/change", hx_target="#main", hx_swap="innerHTML"),
+        Button("Next", hx_get="/change", hx_target="#main", hx_swap="innerHTML", onclick="window.scrollTo(0, 0);"),
         style="padding-left: 10px;padding-right: 10px",
     )
 
