@@ -11,19 +11,12 @@ app, rt = fast_app(
         Script(
             src="https://cdnjs.cloudflare.com/ajax/libs/flexboxgrid/6.3.1/flexboxgrid.min.css",
             type="text/css",
-        ),
-        Script(
-            src="https://cdn.jsdelivr.net/npm/node-snackbar@latest/src/js/snackbar.min.js",
-            type="text/javascript",
-        ),
-        Script(
-            src="https://cdn.jsdelivr.net/npm/node-snackbar@latest/dist/snackbar.min.css",
-            type="text/css",
-        ),
+        )
     ),
     key_fname="/tmp/pynewsreader.sesskey",
 )
 
+setup_toasts(app, duration=5)
 
 def b64_enc(x):
     return base64.b64encode(x.encode("ascii")).decode("ascii")
@@ -116,9 +109,6 @@ def main_page(*args):
                         hx_get="/refresh_feeds",
                         hx_swap="none",
                         style="padding-left: 20px; padding-right: 20px",
-                        onclick="Snackbar.show({pos: 'top-right',  showAction: false,  text: 'Updating all feeds...'});",
-                        # hx_target="#main",
-                        # hx_swap="innerHTML",
                     ),
                     A(
                         Svg(svgs.gear, width=40, height=40),
@@ -153,8 +143,10 @@ def get():
 
 
 @rt("/refresh_feeds")
-def get():
+def get(session):
     pnr.update()
+    add_toast(session, f"Feeds updated. Reload app to view updates.", "info")
+    return P("pynewsreader")
 
 
 @rt("/config")
