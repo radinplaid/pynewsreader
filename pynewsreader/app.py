@@ -2,7 +2,7 @@ from fa6_icons import svgs
 from fasthtml.common import *
 from fire import Fire
 
-from .core import PyNewsReader, Feed
+from .core import Feed, PyNewsReader
 
 pnr = PyNewsReader()
 
@@ -68,7 +68,7 @@ def get_date(entry):
     return article_date.strftime("%Y-%m-%d")
 
 
-def show_articles(mark_read: bool = True, limit: int = 4):
+def show_articles(mark_read: bool = True, limit: int = 32):
     entries = pnr._get_entries(limit=limit, read=False)
     entries = [i for i in entries]
 
@@ -125,9 +125,7 @@ def main_page(*args):
 
 @rt("/")
 def get():
-    return main_page(
-        show_articles()
-    )
+    return main_page(show_articles())
 
 
 @rt("/change")
@@ -137,18 +135,39 @@ def get():
 
 @rt("/config")
 def get():
+    all_feeds = pnr.feeds()
     frm = Form(
         Group(
             Input(name="feed_url", placeholder="Feed URL", type="text"),
             Input(name="feed_name", placeholder="Feed Name", type="text"),
-            Button("Submit"),
+            Button("Add"),
         ),
-        A("Back", href="/", role="button"),
-        action="/add_feed",
+        hx_post="/add_feed",
         method="post",
         hx_swap="innerHTML",
     )
-    return Titled("Add Feed", frm)
+    frm2 = Div(
+        (
+            Form(
+                Group(
+                    Input(
+                        name="feed_url", value=i.url, type="text", inputmode="readonly"
+                    ),
+                    Input(name="feed_name", value=i.name, type="text"),
+                    Button("Remove", cls="secondary"),
+                ),
+                method="post",
+                hx_post="/remove_feed",
+                hx_swap="delete",
+            )
+            for i in all_feeds
+        )
+    )
+    return Div(
+        Titled("Add Feed", frm),
+        Titled("Remove Feed", frm2),
+        A("Back", href="/", role="button"),
+    )
 
 
 @rt("/add_feed")
@@ -157,8 +176,16 @@ def post(feed_url: str, feed_name: str):
     if feed_name in ("None", "none", "null"):
         feed_name = None
     pnr.add_feed(Feed(url=feed_url, name=feed_name))
-    return main_page(P("Feed added"), A("Back", href="/", role="button"),
-)
+    return P("Feed added")
+
+
+@rt("/remove_feed")
+@app.post("/remove_feed")
+def post(feed_url: str, feed_name: str):
+    if feed_name in ("None", "none", "null"):
+        feed_name = None
+    pnr.remove_feed(Feed(url=feed_url, name=feed_name))
+    return P("Feed removed")
 
 
 @rt("/mark_important")
