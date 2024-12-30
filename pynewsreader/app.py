@@ -2,7 +2,7 @@ from fa6_icons import svgs
 from fasthtml.common import *
 from fire import Fire
 
-from .core import PyNewsReader
+from .core import PyNewsReader, Feed
 
 pnr = PyNewsReader()
 
@@ -12,8 +12,8 @@ app, rt = fast_app(
             src="https://cdnjs.cloudflare.com/ajax/libs/flexboxgrid/6.3.1/flexboxgrid.min.css",
             type="text/css",
         )
-    ), 
-    key_fname = "/tmp/pynewsreader.sesskey"
+    ),
+    key_fname="/tmp/pynewsreader.sesskey",
 )
 
 
@@ -68,7 +68,7 @@ def get_date(entry):
     return article_date.strftime("%Y-%m-%d")
 
 
-def show_articles(mark_read: bool = True, limit: int = 12):
+def show_articles(mark_read: bool = True, limit: int = 4):
     entries = pnr._get_entries(limit=limit, read=False)
     entries = [i for i in entries]
 
@@ -84,36 +84,81 @@ def show_articles(mark_read: bool = True, limit: int = 12):
   justify-content: space-between;
   flex-wrap: wrap;""",
         ),
+        Button(
+            "Next",
+            hx_get="/change",
+            hx_target="#main",
+            hx_swap="outerHTML",
+            onclick="window.scrollTo(0, 0);",
+        ),
         cls="row",
         id="main",
     )
 
 
-@rt("/")
-def get():
+def main_page(*args):
     return Div(
         Nav(
-            Ul(Li(H1("pynewsreader"))),
+            Ul(Li(A(H1("pynewsreader"), href="/"))),
             Ul(
                 Li(
                     A(
-                        Svg(svgs.github.brands, width=40, height=40),
-                        href="https://github.com/radinplaid/pynewsreader",
-                        target="_blank",
+                        Svg(svgs.gear, width=40, height=40),
+                        hx_get="/config",
+                        hx_target="#main",
+                        hx_swap="innerHTML",
                     ),
-                )
+                    Li(
+                        A(
+                            Svg(svgs.github.brands, width=40, height=40),
+                            href="https://github.com/radinplaid/pynewsreader",
+                            target="_blank",
+                        ),
+                    ),
+                ),
             ),
         ),
-        show_articles(),
-        Span(cls="mdi mdi-github-circle"),
-        Button("Next", hx_get="/change", hx_target="#main", hx_swap="innerHTML", onclick="window.scrollTo(0, 0);"),
+        *args,
         style="padding-left: 10px;padding-right: 10px",
+    )
+
+
+@rt("/")
+def get():
+    return main_page(
+        show_articles()
     )
 
 
 @rt("/change")
 def get():
     return Div(show_articles())
+
+
+@rt("/config")
+def get():
+    frm = Form(
+        Group(
+            Input(name="feed_url", placeholder="Feed URL", type="text"),
+            Input(name="feed_name", placeholder="Feed Name", type="text"),
+            Button("Submit"),
+        ),
+        A("Back", href="/", role="button"),
+        action="/add_feed",
+        method="post",
+        hx_swap="innerHTML",
+    )
+    return Titled("Add Feed", frm)
+
+
+@rt("/add_feed")
+@app.post("/add_feed")
+def post(feed_url: str, feed_name: str):
+    if feed_name in ("None", "none", "null"):
+        feed_name = None
+    pnr.add_feed(Feed(url=feed_url, name=feed_name))
+    return main_page(P("Feed added"), A("Back", href="/", role="button"),
+)
 
 
 @rt("/mark_important")
