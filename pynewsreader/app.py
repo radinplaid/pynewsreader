@@ -56,7 +56,7 @@ def article_card(entry):
             target="_blank",
         ),
         footer="Date: " + get_date(entry),
-        style="min-width: 450px; max-width:450px;",
+        style="min-width: 420px; max-width:420px;",
     )
 
 
