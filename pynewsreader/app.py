@@ -69,7 +69,7 @@ def get_date(entry):
     return article_date.strftime("%Y-%m-%d")
 
 
-def show_articles(mark_read: bool = True, limit: int = 4):
+def show_articles(mark_read: bool = True, limit: int = 20):
     entries = pnr._get_entries(limit=limit, read=False)
     entries = [i for i in entries]
 
@@ -145,7 +145,7 @@ def get():
 @rt("/refresh_feeds")
 def get(session):
     pnr.update()
-    add_toast(session, f"Feeds updated. Reload app to view updates.", "info")
+    add_toast(session, f"Feeds updated. Reload page to view latest updates.", "info")
     return P("pynewsreader")
 
 
