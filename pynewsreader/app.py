@@ -11,7 +11,15 @@ app, rt = fast_app(
         Script(
             src="https://cdnjs.cloudflare.com/ajax/libs/flexboxgrid/6.3.1/flexboxgrid.min.css",
             type="text/css",
-        )
+        ),
+        Script(
+            src="https://cdn.jsdelivr.net/npm/node-snackbar@latest/src/js/snackbar.min.js",
+            type="text/javascript",
+        ),
+        Script(
+            src="https://cdn.jsdelivr.net/npm/node-snackbar@latest/dist/snackbar.min.css",
+            type="text/css",
+        ),
     ),
     key_fname="/tmp/pynewsreader.sesskey",
 )
@@ -68,7 +76,7 @@ def get_date(entry):
     return article_date.strftime("%Y-%m-%d")
 
 
-def show_articles(mark_read: bool = True, limit: int = 32):
+def show_articles(mark_read: bool = True, limit: int = 4):
     entries = pnr._get_entries(limit=limit, read=False)
     entries = [i for i in entries]
 
@@ -90,6 +98,7 @@ def show_articles(mark_read: bool = True, limit: int = 32):
             hx_target="#main",
             hx_swap="outerHTML",
             onclick="window.scrollTo(0, 0);",
+            style="margin-bottom: 20px"
         ),
         cls="row",
         id="main",
@@ -103,7 +112,17 @@ def main_page(*args):
             Ul(
                 Li(
                     A(
+                        Svg(svgs.arrows_rotate, width=40, height=40),
+                        hx_get="/refresh_feeds",
+                        hx_swap="none",
+                        style="padding-left: 20px; padding-right: 20px",
+                        onclick="Snackbar.show({pos: 'top-right',  showAction: false,  text: 'Updating all feeds...'});",
+                        # hx_target="#main",
+                        # hx_swap="innerHTML",
+                    ),
+                    A(
                         Svg(svgs.gear, width=40, height=40),
+                        style="padding-left: 20px;padding-right: 20px",
                         hx_get="/config",
                         hx_target="#main",
                         hx_swap="innerHTML",
@@ -131,6 +150,11 @@ def get():
 @rt("/change")
 def get():
     return Div(show_articles())
+
+
+@rt("/refresh_feeds")
+def get():
+    pnr.update()
 
 
 @rt("/config")
