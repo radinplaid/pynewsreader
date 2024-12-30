@@ -18,6 +18,7 @@ app, rt = fast_app(
 
 setup_toasts(app, duration=5)
 
+
 def b64_enc(x):
     return base64.b64encode(x.encode("ascii")).decode("ascii")
 
@@ -91,7 +92,7 @@ def show_articles(mark_read: bool = True, limit: int = 20):
             hx_target="#main",
             hx_swap="outerHTML",
             onclick="window.scrollTo(0, 0);",
-            style="margin-bottom: 20px"
+            style="margin-bottom: 20px",
         ),
         cls="row",
         id="main",
@@ -108,14 +109,14 @@ def main_page(*args):
                         Svg(svgs.arrows_rotate, width=40, height=40),
                         hx_get="/refresh_feeds",
                         hx_swap="none",
-                        style="padding-left: 20px; padding-right: 20px",
                     ),
-                    A(
-                        Svg(svgs.gear, width=40, height=40),
-                        style="padding-left: 20px;padding-right: 20px",
-                        hx_get="/config",
-                        hx_target="#main",
-                        hx_swap="innerHTML",
+                    Li(
+                        A(
+                            Svg(svgs.gear, width=40, height=40),
+                            hx_get="/config",
+                            hx_target="#main",
+                            hx_swap="innerHTML",
+                        )
                     ),
                     Li(
                         A(
