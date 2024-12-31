@@ -73,39 +73,48 @@ def get_date(entry):
 def render_entries(entries, next_button=True):
     if next_button:
         next_button = Button(
-                "Next",
-                hx_get="/change",
-                hx_target="#main",
-                hx_swap="outerHTML",
-                onclick="window.scrollTo(0, 0);",
-                style="margin-bottom: 20px",
-            )
+            "Next",
+            hx_get="/change",
+            hx_target="#main",
+            hx_swap="outerHTML",
+            onclick="window.scrollTo(0, 0);",
+            style="margin-bottom: 20px",
+        )
     else:
         next_button = None
+
     return Div(
-            Div(
-                (article_card(entry) for entry in entries),
-                style="""display: flex;
+        Div(
+            (article_card(entry) for entry in entries),
+            style="""display: flex;
     flex-direction: row;
     justify-content: space-between;
     flex-wrap: wrap;""",
-            ),
-            next_button,
-            cls="row",
-            id="main",
-        )
+        ),
+        next_button,
+        cls="row",
+        id="main",
+    )
 
 
-
-def show_articles(mark_read: bool = True, limit: int = 20):
-    entries = pnr._get_entries(limit=limit, read=False)
+def show_articles(mark_read: bool = True, limit: int = 100):
+    entries = pnr._get_entries(limit=limit, read=True)
     entries = [i for i in entries]
+
+    # New articles can be duplicated if the same story is in different feeds
+    # E.g. CBC Top Stories are always in a different feed, too
+    urls = set()
+    unique_entries = []
+    for i in entries:
+        if i.id not in urls:
+            urls.add(i.id)
+            unique_entries.append(i)
 
     if mark_read:
         for entry in entries:
             pnr._reader.mark_entry_as_read(entry)
 
-    return render_entries(entries)
+    return render_entries(unique_entries)
 
 
 def main_page(*args):
