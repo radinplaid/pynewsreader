@@ -16,6 +16,8 @@ app, rt = fast_app(
     key_fname="/tmp/pynewsreader.sesskey",
 )
 
+app.title = "pynewsreader"
+
 setup_toasts(app, duration=2)
 
 
@@ -97,8 +99,8 @@ def render_entries(entries, next_button=True):
     )
 
 
-def show_articles(mark_read: bool = True, limit: int = 100):
-    entries = pnr._get_entries(limit=limit, read=True)
+def show_articles(mark_read: bool = True, limit: int = 20):
+    entries = pnr._get_entries(limit=limit, read=False)
     entries = [i for i in entries]
 
     # New articles can be duplicated if the same story is in different feeds
