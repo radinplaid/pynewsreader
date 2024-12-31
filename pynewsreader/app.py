@@ -1,7 +1,9 @@
+import re
+
+import reader
 from fa6_icons import svgs
 from fasthtml.common import *
 from fire import Fire
-import re
 
 from .core import Feed, PyNewsReader
 
@@ -22,15 +24,7 @@ app.title = "pynewsreader"
 setup_toasts(app, duration=2)
 
 
-def b64_enc(x):
-    return base64.b64encode(x.encode("ascii")).decode("ascii")
-
-
-def b64_dec(x):
-    return base64.b64decode((x.encode("ascii"))).decode("ascii")
-
-
-def get_article_image(res):
+def get_article_image(res: reader.Entry):
     for i in res.enclosures:
         if "image" in i.type:
             return i.href
@@ -39,39 +33,51 @@ def get_article_image(res):
         str(res),
     )
     if len(images) > 0:
-        print(images)
         return images[0].strip("'").strip('"')
     return None
 
 
-def article_card(entry):
+def article_card(entry: reader.Entry, entry_id: str, feed_url: str):
     article_image = get_article_image(entry)
 
     return Card(
         # P("Author: " + entry.author if entry.author else ""),
+        (
+            Img(
+                style="min-height:128px; max-height: 256px; min-width:128px; max-width: 256px; margin-top: 20px; ",
+                src=article_image,
+            )
+            if article_image
+            else None
+        ),
         Div(
-            Button(
-                "👍",
-                cls="secondary",
-                hx_post=f"/mark_important/{b64_enc(entry.feed.url)}/{b64_enc(entry.id)}",
-                hx_swap="none",
+            Form(
+                Group(
+                    Input(name="entry_id", value=entry_id, type="text", hidden=True),
+                    Input(name="feed_url", value=feed_url, type="text", hidden=True),
+                    Button(
+                        "👍",
+                        cls="secondary",
+                        hx_post="/mark_important",
+                        hx_swap="none",
+                    ),
+                ),
+                style="margin-right: 5px;",
             ),
-            Nbsp(),
-            Button(
-                "👎",
-                cls="secondary",
-                hx_post=f"/mark_unimportant/{b64_enc(entry.feed.url)}/{b64_enc(entry.id)}",
-                hx_swap="none",
+            Form(
+                Group(
+                    Input(name="entry_id", value=entry_id, type="text", hidden=True),
+                    Input(name="feed_url", value=feed_url, type="text", hidden=True),
+                    Button(
+                        "👎",
+                        cls="secondary",
+                        hx_post="/mark_unimportant",
+                        hx_swap="none",
+                    ),
+                ),
+                style="margin-left: 5px;",
             ),
-            Nbsp(),
-            (
-                Img(
-                    style="min-height:128px; max-height: 256px; min-width:128px; max-width: 256px; margin-top: 20px; ",
-                    src=article_image,
-                )
-                if article_image
-                else None
-            ),
+            style="display: flex; margin-top: 10px;",
         ),
         P("❗Important") if entry.important else (),
         header=A(
@@ -90,7 +96,15 @@ def article_card(entry):
     )
 
 
-def get_date(entry):
+def get_date(entry: reader.Entry):
+    """Extract date from reader entry
+
+    Args:
+        entry (reader.Entry): reader Entry object
+
+    Returns:
+        str: Formatted date (Y-m-d)
+    """
     if entry.published is not None:
         article_date = entry.published
     else:
@@ -98,7 +112,7 @@ def get_date(entry):
     return article_date.strftime("%Y-%m-%d")
 
 
-def render_entries(entries, next_button=True):
+def render_entries(entries: List[reader.Entry], next_button: bool = True):
     if next_button:
         next_button = Button(
             "Next",
@@ -113,7 +127,7 @@ def render_entries(entries, next_button=True):
 
     return Div(
         Div(
-            (article_card(entry) for entry in entries),
+            (article_card(entry, entry.id, entry.feed.url) for entry in entries),
             style="""display: flex;
     flex-direction: row;
     justify-content: space-between;
@@ -271,6 +285,15 @@ def get():
 @rt("/add_feed")
 @app.post("/add_feed")
 def post(feed_url: str, feed_name: str):
+    """Add RSS feed to pynewsreader
+
+    Args:
+        feed_url (str): URL of RSS feed
+        feed_name (str): Name of RSS feed
+
+    Returns:
+        str: HTML formatted response from pynewsreader.add_feed method
+    """
     if feed_name in ("None", "none", "null"):
         feed_name = None
     pnr.add_feed(Feed(url=feed_url, name=feed_name))
@@ -280,6 +303,15 @@ def post(feed_url: str, feed_name: str):
 @rt("/remove_feed")
 @app.post("/remove_feed")
 def post(feed_url: str, feed_name: str):
+    """Remove RSS feed from pynewsreader
+
+    Args:
+        feed_url (str): URL of RSS feed
+        feed_name (str): Name of RSS feed
+
+    Returns:
+        str: HTML formatted response from pynewsreader.remove_feed method
+    """
     if feed_name in ("None", "none", "null"):
         feed_name = None
     pnr.remove_feed(Feed(url=feed_url, name=feed_name))
@@ -287,21 +319,37 @@ def post(feed_url: str, feed_name: str):
 
 
 @rt("/mark_important")
-@app.post("/mark_important/{feed_url}/{id}")
-def get(session, id: str, feed_url: str):
-    id = b64_dec(id)
-    feed_url = b64_dec(feed_url)
-    ret = pnr._mark_important(feed_url=feed_url, entry_id=id)
+@app.post("/mark_important")
+def post(session, feed_url: str, entry_id: str):
+    """Mark article as important
+
+    Args:
+        session (fasthttp:session): fasthtml session object
+        feed_url (str): RSS feed URL
+        entry_id (str): reader entry ID
+
+    Returns:
+        str: HTML formatted response from pynewsreader._mark_important method
+    """
+    ret = pnr._mark_important(feed_url=feed_url, entry_id=entry_id)
     add_toast(session, f"Marked article as important", "info")
     return P(ret)
 
 
 @rt("/mark_unimportant")
-@app.post("/mark_unimportant/{feed_url}/{id}")
-def get(session, id: str, feed_url: str):
-    id = b64_dec(id)
-    feed_url = b64_dec(feed_url)
-    ret = pnr._mark_unimportant(feed_url=feed_url, entry_id=id)
+@app.post("/mark_unimportant")
+def post(session, feed_url: str, entry_id: str):
+    """Mark article as unimportant
+
+    Args:
+        session (fasthttp:session): fasthtml session object
+        feed_url (str): RSS feed URL
+        entry_id (str): reader entry ID
+
+    Returns:
+        str: HTML formatted response from pynewsreader._mark_unimportant method
+    """
+    ret = pnr._mark_unimportant(feed_url=feed_url, entry_id=entry_id)
     add_toast(session, f"Marked article as unimportant", "info")
     return P(ret)
 
