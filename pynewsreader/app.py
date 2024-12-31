@@ -209,18 +209,34 @@ def get():
 @rt("/search")
 def get():
     frm = (
+        (
+            Form(
+                Group(
+                    Input(name="query", placeholder="Search text", type="text"),
+                    Button("Submit"),
+                ),
+                hx_post="/search_articles",
+                method="post",
+                #hx_swap="outerHTML",
+                hx_target="#main"
+            ),
+        ),
+    )
+    frm2 = (
         Form(
             Group(
-                Input(name="query", placeholder="Search text", type="text"),
-                Button("Submit"),
+                Button("Show Favourites"),
             ),
-            hx_post="/search_articles",
+            hx_post="/favourites",
             method="post",
-            hx_swap="innerHTML",
+            #hx_swap="outerHTML",
+            hx_target="#main"
         ),
     )
     return Div(
         Titled("Search", frm),
+        Titled("Show Favourites", frm2),
+        id="#main"
     )
 
 
@@ -230,6 +246,13 @@ def post(query: str):
     articles = [
         pnr._reader.get_entry(i) for i in pnr._reader.search_entries(query, limit=100)
     ]
+    return render_entries(articles, next_button=False)
+
+
+@rt("/favourites")
+@app.post("/favourites")
+def post():
+    articles = [i for i in pnr._get_entries(important=True, limit=200, read=None)]
     return render_entries(articles, next_button=False)
 
 
