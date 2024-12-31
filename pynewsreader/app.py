@@ -1,6 +1,7 @@
 from fa6_icons import svgs
 from fasthtml.common import *
 from fire import Fire
+import re
 
 from .core import Feed, PyNewsReader
 
@@ -29,23 +30,48 @@ def b64_dec(x):
     return base64.b64decode((x.encode("ascii"))).decode("ascii")
 
 
+def get_article_image(res):
+    for i in res.enclosures:
+        if "image" in i.type:
+            return i.href
+    images = re.findall(
+        '"{1}http[^"\']+.jpg["]|"{1}http[^"\']+.jpeg["]|"{1}http[^"\']+.png["]',
+        str(res),
+    )
+    if len(images) > 0:
+        print(images)
+        return images[0].strip("'").strip('"')
+    return None
+
+
 def article_card(entry):
+    article_image = get_article_image(entry)
 
     return Card(
         # P("Author: " + entry.author if entry.author else ""),
-        P("Source: " + entry.feed.title),
-        Button(
-            "👍",
-            cls="secondary",
-            hx_post=f"/mark_important/{b64_enc(entry.feed.url)}/{b64_enc(entry.id)}",
-            hx_swap="none",
-        ),
-        Nbsp(),
-        Button(
-            "👎",
-            cls="secondary",
-            hx_post=f"/mark_unimportant/{b64_enc(entry.feed.url)}/{b64_enc(entry.id)}",
-            hx_swap="none",
+        Div(
+            Button(
+                "👍",
+                cls="secondary",
+                hx_post=f"/mark_important/{b64_enc(entry.feed.url)}/{b64_enc(entry.id)}",
+                hx_swap="none",
+            ),
+            Nbsp(),
+            Button(
+                "👎",
+                cls="secondary",
+                hx_post=f"/mark_unimportant/{b64_enc(entry.feed.url)}/{b64_enc(entry.id)}",
+                hx_swap="none",
+            ),
+            Nbsp(),
+            (
+                Img(
+                    style="min-height:128px; max-height: 256px; min-width:128px; max-width: 256px; margin-top: 20px; ",
+                    src=article_image,
+                )
+                if article_image
+                else None
+            ),
         ),
         P("❗Important") if entry.important else (),
         header=A(
@@ -59,7 +85,7 @@ def article_card(entry):
             href=entry.link,
             target="_blank",
         ),
-        footer="Date: " + get_date(entry),
+        footer=(P("Source: " + entry.feed.title), P("Date: " + get_date(entry))),
         style="min-width: 420px; max-width:420px;",
     )
 
