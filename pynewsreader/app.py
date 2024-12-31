@@ -16,7 +16,7 @@ app, rt = fast_app(
     key_fname="/tmp/pynewsreader.sesskey",
 )
 
-setup_toasts(app, duration=5)
+setup_toasts(app, duration=2)
 
 
 def b64_enc(x):
@@ -36,14 +36,14 @@ def article_card(entry):
             "👍",
             cls="secondary",
             hx_post=f"/mark_important/{b64_enc(entry.feed.url)}/{b64_enc(entry.id)}",
-            hx_swap="beforeend",
+            hx_swap="none",
         ),
         Nbsp(),
         Button(
             "👎",
             cls="secondary",
             hx_post=f"/mark_unimportant/{b64_enc(entry.feed.url)}/{b64_enc(entry.id)}",
-            hx_swap="beforeend",
+            hx_swap="none",
         ),
         P("❗Important") if entry.important else (),
         header=A(
@@ -70,6 +70,33 @@ def get_date(entry):
     return article_date.strftime("%Y-%m-%d")
 
 
+def render_entries(entries, next_button=True):
+    if next_button:
+        next_button = Button(
+                "Next",
+                hx_get="/change",
+                hx_target="#main",
+                hx_swap="outerHTML",
+                onclick="window.scrollTo(0, 0);",
+                style="margin-bottom: 20px",
+            )
+    else:
+        next_button = None
+    return Div(
+            Div(
+                (article_card(entry) for entry in entries),
+                style="""display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    flex-wrap: wrap;""",
+            ),
+            next_button,
+            cls="row",
+            id="main",
+        )
+
+
+
 def show_articles(mark_read: bool = True, limit: int = 20):
     entries = pnr._get_entries(limit=limit, read=False)
     entries = [i for i in entries]
@@ -78,25 +105,7 @@ def show_articles(mark_read: bool = True, limit: int = 20):
         for entry in entries:
             pnr._reader.mark_entry_as_read(entry)
 
-    return Div(
-        Div(
-            (article_card(entry) for entry in entries),
-            style="""display: flex;
-  flex-direction: row;
-  justify-content: space-between;
-  flex-wrap: wrap;""",
-        ),
-        Button(
-            "Next",
-            hx_get="/change",
-            hx_target="#main",
-            hx_swap="outerHTML",
-            onclick="window.scrollTo(0, 0);",
-            style="margin-bottom: 20px",
-        ),
-        cls="row",
-        id="main",
-    )
+    return render_entries(entries)
 
 
 def main_page(*args):
@@ -106,24 +115,32 @@ def main_page(*args):
             Ul(
                 Li(
                     A(
+                        Svg(svgs.magnifying_glass, width=40, height=40),
+                        hx_get="/search",
+                        hx_swap="innerHTML",
+                        hx_target="#main",
+                    )
+                ),
+                Li(
+                    A(
                         Svg(svgs.arrows_rotate, width=40, height=40),
                         hx_get="/refresh_feeds",
                         hx_swap="none",
-                    ),
-                    Li(
-                        A(
-                            Svg(svgs.gear, width=40, height=40),
-                            hx_get="/config",
-                            hx_target="#main",
-                            hx_swap="innerHTML",
-                        )
-                    ),
-                    Li(
-                        A(
-                            Svg(svgs.github.brands, width=40, height=40),
-                            href="https://github.com/radinplaid/pynewsreader",
-                            target="_blank",
-                        ),
+                    )
+                ),
+                Li(
+                    A(
+                        Svg(svgs.gear, width=40, height=40),
+                        hx_get="/config",
+                        hx_target="#main",
+                        hx_swap="innerHTML",
+                    )
+                ),
+                Li(
+                    A(
+                        Svg(svgs.github.brands, width=40, height=40),
+                        href="https://github.com/radinplaid/pynewsreader",
+                        target="_blank",
                     ),
                 ),
             ),
@@ -136,6 +153,33 @@ def main_page(*args):
 @rt("/")
 def get():
     return main_page(show_articles())
+
+
+@rt("/search")
+def get():
+    frm = (
+        Form(
+            Group(
+                Input(name="query", placeholder="Search text", type="text"),
+                Button("Submit"),
+            ),
+            hx_post="/search_articles",
+            method="post",
+            hx_swap="innerHTML",
+        ),
+    )
+    return Div(
+        Titled("Search", frm),
+    )
+
+
+@rt("/search_articles")
+@app.post("/search_articles")
+def post(query: str):
+    articles = [
+        pnr._reader.get_entry(i) for i in pnr._reader.search_entries(query, limit=100)
+    ]
+    return render_entries(articles, next_button=False)
 
 
 @rt("/change")
@@ -207,24 +251,28 @@ def post(feed_url: str, feed_name: str):
 
 @rt("/mark_important")
 @app.post("/mark_important/{feed_url}/{id}")
-def get(id: str, feed_url: str):
+def get(session, id: str, feed_url: str):
     id = b64_dec(id)
     feed_url = b64_dec(feed_url)
-    return pnr._mark_important(feed_url=feed_url, entry_id=id)
+    ret = pnr._mark_important(feed_url=feed_url, entry_id=id)
+    add_toast(session, f"Marked article as important", "info")
+    return P(ret)
 
 
 @rt("/mark_unimportant")
 @app.post("/mark_unimportant/{feed_url}/{id}")
-def get(id: str, feed_url: str):
+def get(session, id: str, feed_url: str):
     id = b64_dec(id)
     feed_url = b64_dec(feed_url)
-    return pnr._mark_unimportant(feed_url=feed_url, entry_id=id)
+    ret = pnr._mark_unimportant(feed_url=feed_url, entry_id=id)
+    add_toast(session, f"Marked article as unimportant", "info")
+    return P(ret)
 
 
 def main_app(
     host: str = "localhost",
     port: int = 8000,
-    reload: bool = True,
+    reload: bool = False,
     reload_includes: List[str] = [],
     reload_excludes: List[str] = [],
 ):
