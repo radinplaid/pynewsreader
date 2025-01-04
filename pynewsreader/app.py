@@ -181,6 +181,14 @@ def main_page(*args):
                 ),
                 Li(
                     A(
+                        Svg(svgs.heart, width=40, height=40),
+                        hx_get="/favourites",
+                        hx_target="#main",
+                        hx_swap="innerHTML",
+                    )
+                ),
+                Li(
+                    A(
                         Svg(svgs.gear, width=40, height=40),
                         hx_get="/config",
                         hx_target="#main",
@@ -211,47 +219,52 @@ def get():
     frm = (
         (
             Form(
-                Group(
+                Label(
+                    "Query",
                     Input(name="query", placeholder="Search text", type="text"),
-                    Button("Submit"),
                 ),
+                Label(
+                    "Sources",
+                    Select(
+                        Option("All"),
+                        *(Option(i.url) for i in pnr.feeds()),
+                        name="feeds",
+                        cls="selector",
+                    ),
+                ),
+                Button("Submit"),
                 hx_post="/search_articles",
                 method="post",
-                #hx_swap="outerHTML",
-                hx_target="#main"
+                # hx_swap="outerHTML",
+                hx_target="#main",
             ),
-        ),
-    )
-    frm2 = (
-        Form(
-            Group(
-                Button("Show Favourites"),
-            ),
-            hx_post="/favourites",
-            method="post",
-            #hx_swap="outerHTML",
-            hx_target="#main"
         ),
     )
     return Div(
         Titled("Search", frm),
-        Titled("Show Favourites", frm2),
-        id="#main"
+        id="#main",
     )
 
 
 @rt("/search_articles")
 @app.post("/search_articles")
-def post(query: str):
-    articles = [
-        pnr._reader.get_entry(i) for i in pnr._reader.search_entries(query, limit=100)
-    ]
+def post(query: str, feeds: str):
+    if feeds == "All":
+        feeds = None
+
+    if len(query) > 0:
+        articles = [
+            pnr._reader.get_entry(i)
+            for i in pnr._reader.search_entries(query, feed=feeds, limit=200)
+        ]
+    else:
+        articles = [i for i in pnr._reader.get_entries(limit=200, feed=feeds)]
+
     return render_entries(articles, next_button=False)
 
 
 @rt("/favourites")
-@app.post("/favourites")
-def post():
+def get():
     articles = [i for i in pnr._get_entries(important=True, limit=200, read=None)]
     return render_entries(articles, next_button=False)
 
