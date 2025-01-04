@@ -157,7 +157,7 @@ def article_card(entry: reader.Entry, entry_id: str, feed_url: str):
             ),
             style="display: flex; margin-top: 5px;",
         ),
-        style="min-width: 420px; max-width:420px;",
+        style="min-width: 440px; max-width:440px;",
     )
 
 
