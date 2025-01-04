@@ -46,3 +46,23 @@ def get_feed_image(feed_url: str):
         style="max-width:48px; max-height: 48px; min-width:48px; max-width: 48px; margin-right: 10px;}",
         src=f"https://t1.gstatic.com/faviconV2?client=SOCIAL&type=FAVICON&fallback_opts=TYPE,SIZE,URL&size=128&url={feed_url}",
     )
+
+
+def dedupe_articles(entries: List[reader.Entry]):
+    """Deduplicate reader articles in a result set
+
+    Args:
+        entries (List[reader.Entry]): List of reader entries
+
+    Returns:
+        List[reader.Entry]: List of reader entries deduplicated by URL
+    """
+    # New articles can be duplicated if the same story is in different feeds
+    # E.g. CBC Top Stories are always in a different feed, too
+    urls = set()
+    unique_entries = []
+    for i in entries:
+        if i.id not in urls:
+            urls.add(i.id)
+            unique_entries.append(i)
+    return unique_entries

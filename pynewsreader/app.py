@@ -1,14 +1,9 @@
 from fasthtml.common import *
 from fire import Fire
 
-from .app_components import (
-    add_feed_form,
-    article_grid,
-    get_search_form,
-    menu_bar,
-    remove_feed_form,
-    show_articles,
-)
+from .app_components import (add_feed_form, article_grid, get_search_form,
+                             menu_bar, remove_feed_form, show_articles)
+from .app_utils import dedupe_articles
 from .core import Feed, PyNewsReader
 
 pnr = PyNewsReader()
@@ -58,12 +53,15 @@ def post(query: str, feeds: str):
     else:
         articles = [i for i in pnr._reader.get_entries(limit=200, feed=feeds)]
 
+    articles = dedupe_articles(articles)
+
     return article_grid(articles, next_button=False)
 
 
 @rt("/favourites")
 def get():
     articles = [i for i in pnr._get_entries(important=True, limit=200, read=None)]
+    articles = dedupe_articles(articles)
 
     return article_grid(articles, next_button=False)
 

@@ -2,7 +2,8 @@ import reader
 from fa6_icons import svgs
 from fasthtml.common import *
 
-from .app_utils import get_article_image, get_date, get_feed_image
+from .app_utils import (dedupe_articles, get_article_image, get_date,
+                        get_feed_image)
 from .core import Feed, PyNewsReader
 
 
@@ -140,7 +141,7 @@ def article_card(entry: reader.Entry, entry_id: str, feed_url: str):
                         hx_swap="none",
                     ),
                 ),
-                style="margin-right: 5px;width: 50%;",
+                style="margin-right: 5px; width: 50%;",
             ),
             Form(
                 Group(
@@ -157,7 +158,7 @@ def article_card(entry: reader.Entry, entry_id: str, feed_url: str):
             ),
             style="display: flex; margin-top: 5px;",
         ),
-        style="min-width: 440px; max-width:440px;",
+        style="max-width:440px; min-width:440px;",
     )
 
 
@@ -189,20 +190,12 @@ def article_grid(entries: List[reader.Entry], next_button: bool = True):
 
 
 def show_articles(pnr: PyNewsReader, mark_read: bool, limit: int):
-    entries = pnr._get_entries(limit=limit, read=False)
-    entries = [i for i in entries]
+    entries = [i for i in pnr._get_entries(limit=limit, read=False)]
 
-    # New articles can be duplicated if the same story is in different feeds
-    # E.g. CBC Top Stories are always in a different feed, too
-    urls = set()
-    unique_entries = []
-    for i in entries:
-        if i.id not in urls:
-            urls.add(i.id)
-            unique_entries.append(i)
+    entries = dedupe_articles(entries)
 
     if mark_read:
         for entry in entries:
             pnr._reader.mark_entry_as_read(entry)
 
-    return article_grid(unique_entries)
+    return article_grid(entries)
