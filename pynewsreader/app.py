@@ -1,8 +1,14 @@
 from fasthtml.common import *
 from fire import Fire
 
-from .app_components import (add_feed_form, article_grid, get_search_form,
-                             main_page, remove_feed_form, show_articles)
+from .app_components import (
+    add_feed_form,
+    article_grid,
+    get_search_form,
+    menu_bar,
+    remove_feed_form,
+    show_articles,
+)
 from .core import Feed, PyNewsReader
 
 pnr = PyNewsReader()
@@ -15,15 +21,19 @@ app, rt = fast_app(
         )
     ),
     key_fname="/tmp/pynewsreader.sesskey",
-    title="pynewsreader",
 )
+app.title = "pynewsreader"
 
 setup_toasts(app, duration=2)
 
 
 @rt("/")
 def get():
-    return main_page(show_articles(pnr=pnr, mark_read=True, limit=20))
+    return Main(
+        menu_bar(),
+        show_articles(pnr=pnr, mark_read=True, limit=20),
+        style="padding-left: 10px;padding-right: 10px",
+    )
 
 
 @rt("/search")

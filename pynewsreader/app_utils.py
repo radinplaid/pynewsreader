@@ -42,9 +42,7 @@ def get_feed_image(feed_url: str):
     Returns:
         Img: HTML Image/icon
     """
-    return (
-        Img(
-            style="max-width:64px; max-height: 64px; min-width:64px; max-width: 64px; margin-right: 20px;",
-            src=f"https://t1.gstatic.com/faviconV2?client=SOCIAL&type=FAVICON&fallback_opts=TYPE,SIZE,URL&size=128&url={feed_url}",
-        ),
+    return Img(
+        style="max-width:48px; max-height: 48px; min-width:48px; max-width: 48px; margin-right: 10px;}",
+        src=f"https://t1.gstatic.com/faviconV2?client=SOCIAL&type=FAVICON&fallback_opts=TYPE,SIZE,URL&size=128&url={feed_url}",
     )

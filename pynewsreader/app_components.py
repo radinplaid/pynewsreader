@@ -56,7 +56,7 @@ def remove_feed_form(feed: Feed):
     )
 
 
-def main_page(*args):
+def menu_bar():
     return Div(
         Nav(
             Ul(Li(A(H1("pynewsreader"), href="/"))),
@@ -100,9 +100,7 @@ def main_page(*args):
                     ),
                 ),
             ),
-        ),
-        *args,
-        style="padding-left: 10px;padding-right: 10px",
+        )
     )
 
 
@@ -112,13 +110,25 @@ def article_card(entry: reader.Entry, entry_id: str, feed_url: str):
     return Card(
         (
             Img(
-                style="min-height:128px; max-height: 256px; min-width:128px; max-width: 256px; margin-top: 20px; ",
+                style="max-height: 200px; margin-bottom: 10px; display: block; margin-left: auto; margin-right: auto;",
                 src=article_image,
             )
             if article_image
             else None
         ),
-        Div(
+        header=A(
+            get_feed_image(entry.feed.url),
+            H4("❗" + entry.title) if entry.important else H5(entry.title),
+            H6(
+                get_date(entry),
+                style="display: flex; text-decoration: none; margin-left: 5px;",
+            ),
+            style="display: flex; text-decoration: none; ",
+            cls="row",
+            href=entry.link,
+            target="_blank",
+        ),
+        footer=Div(
             Form(
                 Group(
                     Input(name="entry_id", value=entry_id, type="text", hidden=True),
@@ -130,7 +140,7 @@ def article_card(entry: reader.Entry, entry_id: str, feed_url: str):
                         hx_swap="none",
                     ),
                 ),
-                style="margin-right: 5px;",
+                style="margin-right: 5px;width: 50%;",
             ),
             Form(
                 Group(
@@ -143,20 +153,10 @@ def article_card(entry: reader.Entry, entry_id: str, feed_url: str):
                         hx_swap="none",
                     ),
                 ),
-                style="margin-left: 5px;",
+                style="margin-left: 5px; width: 50%;",
             ),
-            style="display: flex; margin-top: 10px;",
+            style="display: flex; margin-top: 5px;",
         ),
-        P("❗Important") if entry.important else (),
-        header=A(
-            get_feed_image(entry.feed.url),
-            H3("❗" + entry.title) if entry.important else H4(entry.title),
-            style="display: flex; text-decoration: none; ",
-            cls="row",
-            href=entry.link,
-            target="_blank",
-        ),
-        footer=(P("Source: " + entry.feed.title), P("Date: " + get_date(entry))),
         style="min-width: 420px; max-width:420px;",
     )
 
