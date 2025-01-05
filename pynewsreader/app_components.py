@@ -1,7 +1,6 @@
 import reader
 from fa6_icons import svgs
 from fasthtml.common import *
-
 from .app_utils import dedupe_articles, get_article_image, get_date, get_feed_image
 from .core import Feed, PyNewsReader
 
@@ -118,12 +117,15 @@ def article_card(entry: reader.Entry, entry_id: str, feed_url: str):
 
     return Card(
         (
-            Img(
-                style="max-height: 200px; margin-bottom: 10px; display: block; margin-left: auto; margin-right: auto;",
-                src=article_image,
-            )
-            if article_image
-            else None
+            (
+                Img(
+                    style="max-height: 200px; margin-bottom: 10px; display: block; margin-left: auto; margin-right: auto;",
+                    src=article_image,
+                )
+                if article_image
+                else None
+            ),
+            Details(entry.get_content().value, cls="marked"),
         ),
         header=A(
             get_feed_image(entry.feed.url),

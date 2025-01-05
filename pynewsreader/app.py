@@ -19,7 +19,9 @@ app, rt = fast_app(
         Script(
             src="https://cdnjs.cloudflare.com/ajax/libs/flexboxgrid/6.3.1/flexboxgrid.min.css",
             type="text/css",
-        )
+        ),
+        MarkdownJS(),
+        HighlightJS(langs=["python", "javascript", "css"]),
     ),
     key_fname="/tmp/pynewsreader.sesskey",
 )

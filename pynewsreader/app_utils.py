@@ -9,7 +9,7 @@ def get_article_image(res: reader.Entry):
         if "image" in i.type:
             return i.href
     images = re.findall(
-        '"{1}http[^"\']+.jpg["]|"{1}http[^"\']+.jpeg["]|"{1}http[^"\']+.png["]',
+        "http[^\"')]+.[jJ]{1}[pP]{1}[eE]{0,1}[gG]{1}|http[^\"')]+.[pP]{1}[Nn]{1}[gG]{1}",
         str(res),
     )
     if len(images) > 0:
