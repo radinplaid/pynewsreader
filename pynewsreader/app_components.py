@@ -1,7 +1,9 @@
 import reader
 from fa6_icons import svgs
 from fasthtml.common import *
-from .app_utils import dedupe_articles, get_article_image, get_date, get_feed_image
+
+from .app_utils import (dedupe_articles, get_article_image, get_date,
+                        get_feed_image)
 from .core import Feed, PyNewsReader
 
 
@@ -60,6 +62,35 @@ def remove_feed_form(feed: Feed):
         ),
         method="post",
         hx_post="/remove_feed",
+        hx_swap="delete",
+    )
+
+
+def add_blacklist_form():
+    return Form(
+        Group(
+            Input(name="blacklist_string", placeholder="Blacklist String", type="text"),
+            Button("Add"),
+        ),
+        hx_post="/add_blacklist",
+        method="post",
+        hx_swap="innerHTML",
+    )
+
+
+def remove_blacklist_form(blacklist_string: str):
+    return Form(
+        Group(
+            Input(
+                name="blacklist_string",
+                value=blacklist_string,
+                type="text",
+                inputmode="readonly",
+            ),
+            Button("Remove", cls="secondary"),
+        ),
+        method="post",
+        hx_post="/remove_blacklist",
         hx_swap="delete",
     )
 

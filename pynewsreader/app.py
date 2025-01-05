@@ -1,14 +1,9 @@
 from fasthtml.common import *
 from fire import Fire
 
-from .app_components import (
-    add_feed_form,
-    article_grid,
-    get_search_form,
-    menu_bar,
-    remove_feed_form,
-    show_articles,
-)
+from .app_components import (add_blacklist_form, add_feed_form, article_grid,
+                             get_search_form, menu_bar, remove_blacklist_form,
+                             remove_feed_form, show_articles)
 from .app_utils import dedupe_articles
 from .core import Feed, PyNewsReader
 
@@ -98,12 +93,17 @@ def get(session):
 def get():
     all_feeds = pnr.feeds()
 
-    frm = add_feed_form()
-    frm2 = Div((remove_feed_form(i) for i in all_feeds))
+    add_feed_frm = add_feed_form()
+    remove_feed_frm = Div((remove_feed_form(i) for i in all_feeds))
+
+    add_blacklist_frm = add_blacklist_form()
+    remove_blacklist_frm = Div((remove_blacklist_form(i) for i in pnr.blacklist_show()))
 
     return Div(
-        Titled("Add Feed", frm),
-        Titled("Remove Feed", frm2),
+        Titled("Add Feed", add_feed_frm),
+        Titled("Remove Feed", remove_feed_frm),
+        Titled("Add to blacklist", add_blacklist_frm),
+        Titled("Remove from blacklist", remove_blacklist_frm),
         A("Back", href="/", role="button"),
     )
 
@@ -146,6 +146,38 @@ def post(feed_url: str, feed_name: str):
     pnr.remove_feed(Feed(url=feed_url, name=feed_name))
 
     return P("Feed removed")
+
+
+@rt("/add_blacklist")
+@app.post("/add_blacklist")
+def post(blacklist_string: str):
+    """Add entry feed to pynewsreader blacklist
+
+    Args:
+        blacklist_string (str): String to match for blacklist
+
+    Returns:
+        str: HTML formatted response from pynewsreader.blacklist_add method
+    """
+    pnr.blacklist_add(blacklist_string)
+
+    return P(f"String {blacklist_string} added to blacklist")
+
+
+@rt("/remove_blacklist")
+@app.post("/remove_blacklist")
+def post(blacklist_string: str):
+    """Remove entry feed to pynewsreader blacklist
+
+    Args:
+        blacklist_string (str): String to match for blacklist
+
+    Returns:
+        str: HTML formatted response from pynewsreader.blacklist_remove method
+    """
+    pnr.blacklist_remove(blacklist_string)
+
+    return P(f"String {blacklist_string} removed from blacklist")
 
 
 @rt("/mark_important")
