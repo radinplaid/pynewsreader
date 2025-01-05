@@ -1,10 +1,18 @@
 from fasthtml.common import *
 from fire import Fire
 
-from .app_components import (add_blacklist_form, add_feed_form,
-                             add_whitelist_form, article_grid, get_search_form,
-                             menu_bar, remove_blacklist_form, remove_feed_form,
-                             remove_whitelist_form, show_articles)
+from .app_components import (
+    add_blacklist_form,
+    add_feed_form,
+    add_whitelist_form,
+    article_grid,
+    get_search_form,
+    menu_bar,
+    remove_blacklist_form,
+    remove_feed_form,
+    remove_whitelist_form,
+    show_articles,
+)
 from .app_utils import dedupe_articles
 from .core import Feed, PyNewsReader
 
@@ -94,21 +102,16 @@ def get(session):
 def get():
     all_feeds = pnr.feeds()
 
-    add_feed_frm = add_feed_form()
     remove_feed_frm = Div((remove_feed_form(i) for i in all_feeds))
-
-    add_blacklist_frm = add_blacklist_form()
     remove_blacklist_frm = Div((remove_blacklist_form(i) for i in pnr.blacklist_show()))
-
-    add_whitelist_frm = add_whitelist_form()
     remove_whitelist_frm = Div((remove_whitelist_form(i) for i in pnr.whitelist_show()))
 
     return Div(
-        Titled("Add Feed", add_feed_frm),
+        Titled("Add Feed", add_feed_form()),
         Titled("Remove Feed", remove_feed_frm),
-        Titled("Add to blacklist", add_blacklist_frm),
+        Titled("Add to blacklist", add_blacklist_form()),
         Titled("Remove from blacklist", remove_blacklist_frm),
-        Titled("Add to whitelist", add_whitelist_frm),
+        Titled("Add to whitelist", add_whitelist_form()),
         Titled("Remove from whitelist", remove_whitelist_frm),
         A("Back", href="/", role="button"),
     )
@@ -131,7 +134,7 @@ def post(feed_url: str, feed_name: str):
 
     pnr.add_feed(Feed(url=feed_url, name=feed_name))
 
-    return P("Feed added")
+    return Div(P(f"Added feed {feed_url}"), add_feed_form())
 
 
 @rt("/remove_feed")
@@ -167,7 +170,10 @@ def post(blacklist_string: str):
     """
     pnr.blacklist_add(blacklist_string)
 
-    return P(f"String {blacklist_string} added to blacklist")
+    return Div(
+        P(f"String {blacklist_string} added to blacklist"),
+        add_blacklist_form(),
+    )
 
 
 @rt("/remove_blacklist")
@@ -199,7 +205,10 @@ def post(whitelist_string: str):
     """
     pnr.whitelist_add(whitelist_string)
 
-    return P(f"String {whitelist_string} added to whitelist")
+    return Div(
+        P(f"String {whitelist_string} added to whitelist"),
+        add_whitelist_form(),
+    )
 
 
 @rt("/remove_whitelist")
