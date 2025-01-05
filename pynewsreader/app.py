@@ -1,19 +1,11 @@
 from fasthtml.common import *
 from fire import Fire
 
-from .app_components import (
-    add_blacklist_form,
-    add_feed_form,
-    add_whitelist_form,
-    article_grid,
-    get_search_form,
-    menu_bar,
-    remove_blacklist_form,
-    remove_feed_form,
-    remove_whitelist_form,
-    show_articles,
-)
-from .app_utils import dedupe_articles
+from .app_components import (add_blacklist_form, add_feed_form,
+                             add_whitelist_form, article_grid, get_search_form,
+                             menu_bar, remove_blacklist_form, remove_feed_form,
+                             remove_whitelist_form, show_articles)
+from .app_utils import dedupe_articles, list_to_markdown_table
 from .core import Feed, PyNewsReader
 
 pnr = PyNewsReader()
@@ -265,6 +257,32 @@ def post(session, feed_url: str, entry_id: str):
     add_toast(session, f"Marked article as unimportant", "info")
 
     return P(ret)
+
+
+@rt("/stats")
+@app.get("/stats")
+def get(session):
+    """Get RSS feed stats
+
+    Returns:
+        str: HTML formatted response
+    """
+
+    all_stats = []
+    for i in [i for i in pnr._reader.get_feeds()]:
+        stats = pnr._reader.get_entry_counts(feed=i.url)
+        all_stats.append(
+            {
+                "Feed URL": i.url,
+                "Feed Name": str(i.title).replace("|", "/"),
+                "Total": stats.total,
+                "Read": stats.read,
+            }
+        )
+
+    return Div(
+        H4("Feed Statistics"), P(list_to_markdown_table(all_stats), cls="marked")
+    )
 
 
 def main_app(

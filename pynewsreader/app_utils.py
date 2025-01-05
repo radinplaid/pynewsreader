@@ -13,7 +13,9 @@ def get_article_image(res: reader.Entry):
         str(res),
     )
     if len(images) > 0:
-        return images[0].strip("'").strip('"')
+        ret = images[0].strip("'").strip('"')
+        # Strange unicode symbol in marktechpost image URLs
+        return ret.replace("\\u202f", "%E2%80%AF")
     return None
 
 
@@ -66,3 +68,28 @@ def dedupe_articles(entries: List[reader.Entry]):
             urls.add(i.id)
             unique_entries.append(i)
     return unique_entries
+
+
+def list_to_markdown_table(listOfDicts):
+    """Loop through a list of dicts and return a markdown table as a multi-line string.
+
+    Source: https://github.com/codazoda/tomark/blob/master/tomark/tomark.py
+
+    listOfDicts -- A list of dictionaries, each dict is a row
+
+    """
+    markdowntable = ""
+    # Make a string of all the keys in the first dict with pipes before after and between each key
+    markdownheader = "| " + " | ".join(map(str, listOfDicts[0].keys())) + " |"
+    # Make a header separator line with dashes instead of key names
+    markdownheaderseparator = "|-----" * len(listOfDicts[0].keys()) + "|"
+    # Add the header row and separator to the table
+    markdowntable += markdownheader + "\n"
+    markdowntable += markdownheaderseparator + "\n"
+    # Loop through the list of dictionaries outputting the rows
+    for row in listOfDicts:
+        markdownrow = ""
+        for key, col in row.items():
+            markdownrow += "| " + str(col) + " "
+        markdowntable += markdownrow + "|" + "\n"
+    return markdowntable

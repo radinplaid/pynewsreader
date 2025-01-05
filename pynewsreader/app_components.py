@@ -145,6 +145,14 @@ def menu_bar():
                 ),
                 Li(
                     A(
+                        Svg(svgs.chart_simple, width=40, height=40),
+                        hx_get="/stats",
+                        hx_target="#main",
+                        hx_swap="innerHTML",
+                    )
+                ),
+                Li(
+                    A(
                         Svg(svgs.heart, width=40, height=40),
                         hx_get="/favourites",
                         hx_target="#main",
