@@ -2,8 +2,7 @@ import reader
 from fa6_icons import svgs
 from fasthtml.common import *
 
-from .app_utils import (dedupe_articles, get_article_image, get_date,
-                        get_feed_image)
+from .app_utils import dedupe_articles, get_article_image, get_date, get_feed_image
 from .core import Feed, PyNewsReader
 
 
@@ -21,6 +20,15 @@ def get_search_form(
                 Option("All"),
                 *(Option(i.url) for i in pnr.feeds()),
                 name="feeds",
+                cls="selector",
+            ),
+        ),
+        Label(
+            "Tags",
+            Select(
+                Option("none"),
+                *(Option(i) for i in pnr._reader.get_tag_keys()),
+                name="tags",
                 cls="selector",
             ),
         ),
