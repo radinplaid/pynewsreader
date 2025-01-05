@@ -50,7 +50,7 @@ def get():
 def post(query: str, feeds: str, tags: str):
     if feeds == "All":
         feeds = None
-    if tags == "none":
+    if tags == "all":
         tags = False
 
     if len(query) > 0:

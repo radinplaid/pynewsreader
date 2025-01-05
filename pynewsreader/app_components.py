@@ -26,7 +26,7 @@ def get_search_form(
         Label(
             "Tags",
             Select(
-                Option("none"),
+                Option("all"),
                 *(Option(i) for i in pnr._reader.get_tag_keys()),
                 name="tags",
                 cls="selector",
@@ -166,7 +166,7 @@ def article_card(entry: reader.Entry, entry_id: str, feed_url: str):
             ),
             style="display: flex; margin-top: 5px;",
         ),
-        style="max-width:440px; min-width:440px;",
+        style="max-width:420px; min-width:420px;",
     )
 
 
