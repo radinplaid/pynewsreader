@@ -1,9 +1,10 @@
 from fasthtml.common import *
 from fire import Fire
 
-from .app_components import (add_blacklist_form, add_feed_form, article_grid,
-                             get_search_form, menu_bar, remove_blacklist_form,
-                             remove_feed_form, show_articles)
+from .app_components import (add_blacklist_form, add_feed_form,
+                             add_whitelist_form, article_grid, get_search_form,
+                             menu_bar, remove_blacklist_form, remove_feed_form,
+                             remove_whitelist_form, show_articles)
 from .app_utils import dedupe_articles
 from .core import Feed, PyNewsReader
 
@@ -99,11 +100,16 @@ def get():
     add_blacklist_frm = add_blacklist_form()
     remove_blacklist_frm = Div((remove_blacklist_form(i) for i in pnr.blacklist_show()))
 
+    add_whitelist_frm = add_whitelist_form()
+    remove_whitelist_frm = Div((remove_whitelist_form(i) for i in pnr.whitelist_show()))
+
     return Div(
         Titled("Add Feed", add_feed_frm),
         Titled("Remove Feed", remove_feed_frm),
         Titled("Add to blacklist", add_blacklist_frm),
         Titled("Remove from blacklist", remove_blacklist_frm),
+        Titled("Add to whitelist", add_whitelist_frm),
+        Titled("Remove from whitelist", remove_whitelist_frm),
         A("Back", href="/", role="button"),
     )
 
@@ -178,6 +184,38 @@ def post(blacklist_string: str):
     pnr.blacklist_remove(blacklist_string)
 
     return P(f"String {blacklist_string} removed from blacklist")
+
+
+@rt("/add_whitelist")
+@app.post("/add_whitelist")
+def post(whitelist_string: str):
+    """Add entry feed to pynewsreader whitelist
+
+    Args:
+        whitelist_string (str): String to match for whitelist
+
+    Returns:
+        str: HTML formatted response from pynewsreader.whitelist_add method
+    """
+    pnr.whitelist_add(whitelist_string)
+
+    return P(f"String {whitelist_string} added to whitelist")
+
+
+@rt("/remove_whitelist")
+@app.post("/remove_whitelist")
+def post(whitelist_string: str):
+    """Remove entry feed to pynewsreader whitelist
+
+    Args:
+        whitelist_string (str): String to match for whitelist
+
+    Returns:
+        str: HTML formatted response from pynewsreader.whitelist_remove method
+    """
+    pnr.whitelist_remove(whitelist_string)
+
+    return P(f"String {whitelist_string} removed from whitelist")
 
 
 @rt("/mark_important")
