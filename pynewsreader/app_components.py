@@ -192,7 +192,7 @@ def article_card(entry: reader.Entry, entry_id: str, feed_url: str):
                 if article_image
                 else None
             ),
-            Details(entry.get_content().value, cls="marked"),
+            Details(entry.get_content().value, cls="marked") if hasattr(entry.get_content(), "value") else "",
         ),
         header=A(
             get_feed_image(entry.feed.url),
