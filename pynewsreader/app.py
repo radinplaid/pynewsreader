@@ -1,5 +1,6 @@
 from fasthtml.common import *
 from fire import Fire
+from collections import deque 
 
 from .app_components import (add_blacklist_form, add_feed_form,
                              add_whitelist_form, article_grid, get_search_form,
@@ -9,6 +10,8 @@ from .app_utils import dedupe_articles, list_to_markdown_table
 from .core import Feed, PyNewsReader
 
 pnr = PyNewsReader()
+
+read_articles = deque(maxlen=1000)
 
 app, rt = fast_app(
     hdrs=(
@@ -30,7 +33,7 @@ setup_toasts(app, duration=2)
 def get():
     return Main(
         menu_bar(),
-        show_articles(pnr=pnr, mark_read=True, limit=20),
+        show_articles(pnr=pnr, read_articles=read_articles, mark_read=True, limit=8),
         style="padding-left: 10px;padding-right: 10px",
     )
 
@@ -78,7 +81,7 @@ def get():
 
 @rt("/change")
 def get():
-    return Div(show_articles(pnr, mark_read=True, limit=20))
+    return Div(show_articles(pnr, read_articles=read_articles, mark_read=True, limit=8))
 
 
 @rt("/refresh_feeds")
@@ -312,6 +315,7 @@ def main_app(
 
 
 def cli_app():
+    """Launch pynewsreader web application"""
     return Fire(main_app)
 
 

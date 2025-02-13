@@ -1,6 +1,7 @@
 import reader
 from fa6_icons import svgs
 from fasthtml.common import *
+from collections import deque 
 
 from .app_utils import dedupe_articles, get_article_image, get_date, get_feed_image
 from .core import Feed, PyNewsReader
@@ -266,13 +267,18 @@ def article_grid(entries: List[reader.Entry], next_button: bool = True):
     )
 
 
-def show_articles(pnr: PyNewsReader, mark_read: bool, limit: int):
-    entries = [i for i in pnr._get_entries(limit=limit, read=False)]
+def show_articles(pnr: PyNewsReader, read_articles: deque, mark_read: bool, limit: int):
+    entries = [i for i in pnr._get_entries(limit=limit*4, read=False)]
 
     entries = dedupe_articles(entries)
 
-    if mark_read:
-        for entry in entries:
-            pnr._reader.mark_entry_as_read(entry)
+    entries_to_read = []
 
-    return article_grid(entries)
+    for entry in entries:
+        if entry.id not in read_articles:
+            read_articles.appendleft(entry.id)
+            entries_to_read.append(entry)
+            if mark_read:
+                pnr._reader.mark_entry_as_read(entry)
+        if len(entries_to_read) >= limit:
+            return article_grid(entries_to_read[:limit])
