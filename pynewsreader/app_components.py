@@ -236,7 +236,7 @@ def article_card(entry: reader.Entry, entry_id: str, feed_url: str):
             ),
             style="display: flex; margin-top: 5px;",
         ),
-        style="max-width:420px; min-width:420px;",
+        style="max-width:400px; min-width:400px;",
     )
 
 
